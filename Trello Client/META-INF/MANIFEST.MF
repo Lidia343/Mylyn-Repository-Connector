@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Trello_Client
+Bundle-SymbolicName: Trello_Client;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: Trello_Client
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.swt,
+ org.eclipse.jface,
+ com.google.gson
