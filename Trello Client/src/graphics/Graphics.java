@@ -40,7 +40,6 @@ import connection.TrelloConnection;
 import handle.NoConnectionResultHandler;
 import model.Board;
 import model.BoardList;
-import model.BoardsContentProvider;
 import model.Card;
 import model.CardList;
 import model.User;

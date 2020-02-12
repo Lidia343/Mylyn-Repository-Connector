@@ -1,6 +1,8 @@
-package model;
+package graphics;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+
+import model.BoardList;
 
 /**
  * Класс необходим для предоставления данных о списке досок компоненту TableViewer.
