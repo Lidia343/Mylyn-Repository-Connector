@@ -17,9 +17,8 @@ import model.User;
 
 /**
  * Класс предназначен для установки соединения с сайтом trello.com и получения от него пользовательских данных (информации о пользователе, его досках, списках и карточках).
- *
  */
-public class TrelloConnection
+public class TrelloConnection implements ITrelloConnection
 {
 	private NoConnectionResultHandler m_noConHandler;
 	private String m_mainUrlPart = "https://api.trello.com/1/";
@@ -37,13 +36,6 @@ public class TrelloConnection
 		m_gson = (new GsonBuilder().create());
 	}
 	
-	/**
-	 * Метод для установки соединения и получения данных о пользователе.
-	 * @param key - ключ пользователя
-	 * @param token - токен  пользователя
-	 * @return объект класса User, содержащий информацию о пользователе
-	 * @throws IOException 
-	 */
 	public User connectAndGetUserData(String a_key, String a_token) throws IOException
 	{
 		m_key = a_key;
@@ -55,11 +47,6 @@ public class TrelloConnection
 		return user;
 	}
 	
-	/**
-	 * Метод для получения списка досок.
-	 * @return объект класса BoardList, содержащий список досок
-	 * @throws IOException
-	 */
 	public BoardList getBoardList() throws IOException
 	{
 		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "members/me?fields=none&boards=all&board_fields=name,url&key=" + m_key + "&token=" + m_token);
@@ -69,12 +56,6 @@ public class TrelloConnection
 		return boardList;
 	}
 	
-	/**
-	 * Метод для получения списка списков карточек одной доски.
-	 * @param a_boardId - id доски
-	 * @return список List списков CardList карточек Card (объект класса CardList содержит название списка карточек и сам список List карточек)
-	 * @throws IOException
-	 */
 	public List<CardList> getCardLists (String a_boardId) throws IOException
 	{
 		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "boards/" + a_boardId + "/lists?cards=open&card_fields=name,desc,url&fields=name&key=" + m_key + "&token=" + m_token);
