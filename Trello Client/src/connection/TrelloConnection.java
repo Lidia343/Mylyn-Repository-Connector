@@ -22,7 +22,6 @@ import model.User;
 public class TrelloConnection
 {
 	private NoConnectionResultHandler m_noConHandler;
-	private HttpURLConnection m_connection;
 	private String m_mainUrlPart = "https://api.trello.com/1/";
 	private Gson m_gson;
 	private String m_key;
@@ -95,10 +94,10 @@ public class TrelloConnection
 	private String connectByUrlAndGetResponse(String a_requestMethod, String a_url) throws IOException
 	{
 		URL userDataURL = new URL (a_url);
-		m_connection = (HttpURLConnection) userDataURL.openConnection();
-		m_connection.setRequestMethod(a_requestMethod);///ТИПЫ
-		m_connection.connect();
-		int responseCode = m_connection.getResponseCode();
+		HttpURLConnection connection = (HttpURLConnection) userDataURL.openConnection();
+		connection.setRequestMethod(a_requestMethod);
+		connection.connect();
+		int responseCode = connection.getResponseCode();
 		if (responseCode >= 400 && responseCode < 500)
 		{
 			m_noConHandler.createMessage("Ошибка клиента");
@@ -109,10 +108,16 @@ public class TrelloConnection
 			m_noConHandler.createMessage("Ошибка сервера");
 			return null;
 		}
-		BufferedReader bufferedReader = new BufferedReader (new InputStreamReader (m_connection.getInputStream()));
-		String line = bufferedReader.readLine();
-		bufferedReader.close();
-		m_connection.disconnect();
-		return line;
+		try(BufferedReader bufferedReader = new BufferedReader (new InputStreamReader (connection.getInputStream())))
+		{
+			StringBuilder builder = new StringBuilder();
+			String line;
+			while ((line = bufferedReader.readLine()) != null)
+			{
+				builder.append(line + "\n");
+			}
+			connection.disconnect();
+			return builder.toString();
+		}
 	}
 }
