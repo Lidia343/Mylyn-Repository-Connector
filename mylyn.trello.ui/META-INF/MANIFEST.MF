@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Mylyn Trello Connector UI
+Bundle-SymbolicName: mylyn.trello.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: mylyn.trello.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.mylyn.tasks.ui,
+ org.eclipse.jface,
+ org.eclipse.mylyn.tasks.core,
+ org.eclipse.jdt,
+ org.eclipse.jdt.annotation,
+ org.eclipse.jdt.annotation,
+ org.eclipse.core.runtime,
+ org.eclipse.core.runtime.source,
+ mylyn.trello.core
