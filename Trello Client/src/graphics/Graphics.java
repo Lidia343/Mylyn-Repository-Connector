@@ -539,6 +539,7 @@ public class Graphics
             	m_urlText.setText(board.getUrl());
             	m_boardLabel.setText("Доска \"" + board.getName() + "\". Списки карточек:");
             	m_boardLabel.setVisible(true);
+            	System.out.println(board.getId()); ////////////////////////////////////////////////////////////////////////////
             	
             	m_cardLists = new ArrayList<>();
             	
@@ -593,6 +594,7 @@ public class Graphics
 											m_cardDescText.setText("<Описание отсутствует>");
 										m_urlLabel.setText("URL карточки:");
 										m_urlText.setText(card.getUrl());
+										//System.out.println(card.getId()); ////////////////////////////////////////////////////////////////////////////
 										setCardDescComponentsVisible(true);
 									}
 								}

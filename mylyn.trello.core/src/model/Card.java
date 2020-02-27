@@ -18,6 +18,42 @@ public class Card
 		name = "";
 	}
 	
+	/**
+	 * Метод для установки id карточки.
+	 * @param a_id - id
+	 */
+	public void setId(String a_id)
+	{
+		id = a_id;
+	}
+	
+	/**
+	 * Метод для установки названия карточки.
+	 * @param a_name - название
+	 */
+	public void setName(String a_name)
+	{
+		name = a_name;
+	}
+	
+	/**
+	 * Метод для установки описания карточки.
+	 * @param a_name - описание
+	 */
+	public void setDesc(String a_desc)
+	{
+		desc = a_desc;
+	}
+	
+	/**
+	 * Метод для установки url карточки.
+	 * @param a_name - url
+	 */
+	public void setUrl(String a_url)
+	{
+		url = a_url;
+	}
+	
 	public String getId()
 	{
 		return id;
