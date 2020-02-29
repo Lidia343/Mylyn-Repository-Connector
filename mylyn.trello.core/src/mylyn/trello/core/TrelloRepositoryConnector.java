@@ -1,4 +1,5 @@
-package mylyn.trello.ui;
+package mylyn.trello.core;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -17,15 +18,20 @@ import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
 	public final static String CONNECTOR_KIND = "trello";
-	
+
+	public TrelloRepositoryConnector()
+	{
+		
+	}
+
 	@Override
-	public boolean canCreateNewTask(@NonNull TaskRepository a_taskRepository)
+	public boolean canCreateNewTask(@NonNull TaskRepository a_repository)
 	{
 		return false;
 	}
 
 	@Override
-	public boolean canCreateTaskFromKey(@NonNull TaskRepository a_taskRepository)
+	public boolean canCreateTaskFromKey(@NonNull TaskRepository a_repository)
 	{
 		return false;
 	}
@@ -43,29 +49,21 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	}
 
 	@Override
-	public @Nullable String getRepositoryUrlFromTaskUrl(@NonNull String a_taskFullUrl)
+	public @Nullable String getRepositoryUrlFromTaskUrl(@NonNull String a_taskUrl)
 	{
 		return "api.trello.com";
 	}
 
-	
-	public TaskData getTaskData(@NonNull TaskRepository a_taskRepository, @NonNull String a_taskId, IProgressMonitor a_monitor) throws CoreException
+	@Override
+	public @Nullable String getTaskIdFromTaskUrl(@NonNull String a_taskUrl)
 	{
-		TaskData taskData = new TaskData(new TaskAttributeMapper(a_taskRepository), a_taskRepository.getConnectorKind(), a_taskRepository.getRepositoryUrl(), a_taskId); 
-		return taskData; 
+		return null;
 	}
 
 	@Override
-	public @Nullable String getTaskIdFromTaskUrl(@NonNull String a_taskFullUrl)
+	public @Nullable String getTaskUrl(@NonNull String a_repositoryUrl, @NonNull String a_taskIdOrKey)
 	{
-		
-		return null; 
-	}
-
-	@Override
-	public @Nullable String getTaskUrl(@NonNull String a_repositoryUrl, @NonNull String a_taskId)
-	{
-		return null; 
+		return null;
 	}
 
 	@Override
@@ -77,18 +75,26 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public void updateTaskFromTaskData(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
-		
+
 	}
 
 	@Override
-	public IStatus performQuery(@NonNull TaskRepository a_taskRepository, @NonNull IRepositoryQuery a_query, 
-								@NonNull TaskDataCollector a_collector, @Nullable ISynchronizationSession a_session, IProgressMonitor a_monitor)
+	public @NonNull TaskData getTaskData(@NonNull TaskRepository a_repository, @NonNull String a_taskId, 
+			                             IProgressMonitor a_monitor) throws CoreException
+	{
+		TaskData taskData = new TaskData(new TaskAttributeMapper(a_repository), a_repository.getConnectorKind(), a_repository.getRepositoryUrl(), a_taskId); 
+		return taskData; 
+	}
+
+	@Override
+	public IStatus performQuery(@NonNull TaskRepository a_repository, @NonNull IRepositoryQuery a_query, @NonNull TaskDataCollector a_collector, 
+			                    @Nullable ISynchronizationSession a_session, IProgressMonitor a_monitor)
 	{
 		return Status.OK_STATUS; 
 	}
 
 	@Override
-	public void updateRepositoryConfiguration(@NonNull TaskRepository a_taskRepository, IProgressMonitor a_progressMonitor) throws CoreException
+	public void updateRepositoryConfiguration(@NonNull TaskRepository a_taskRepository, IProgressMonitor a_monitor) throws CoreException
 	{
 		
 	}

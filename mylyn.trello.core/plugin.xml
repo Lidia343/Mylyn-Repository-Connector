@@ -2,9 +2,10 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-   		 id="mylyn.trello.repository"
-         name="Trello Repository"
          point="org.eclipse.mylyn.tasks.ui.repositories">
+      <connectorCore
+            class="mylyn.trello.core.TrelloRepositoryConnector">
+      </connectorCore>
    </extension>
 
 </plugin>
