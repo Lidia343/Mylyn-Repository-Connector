@@ -1,4 +1,4 @@
-package mylyn.trello.core.model;
+package trello.core.model;
 
 import java.util.List;
 

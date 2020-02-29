@@ -1,13 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Mylyn Trello Connector Core
-Bundle-SymbolicName: mylyn.trello.core;singleton:=true
+Bundle-Name: Trello Connector Core
+Bundle-SymbolicName: trello.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Automatic-Module-Name: mylyn.trello.core
+Automatic-Module-Name: trello.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: com.google.gson,
  org.eclipse.mylyn.tasks.ui,
  org.eclipse.mylyn.tasks.core,
  org.eclipse.core.runtime,
  org.eclipse.jdt.annotation
-Export-Package: mylyn.trello.core.connection, mylyn.trello.core.handle, mylyn.trello.core.model, mylyn.trello.core
+Export-Package: trello.core,
+ trello.core.connection,
+ trello.core.handle,
+ trello.core.model

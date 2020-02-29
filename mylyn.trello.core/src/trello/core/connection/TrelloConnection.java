@@ -1,4 +1,4 @@
-package mylyn.trello.core.connection;
+package trello.core.connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,10 +10,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import mylyn.trello.core.handle.NoConnectionResultHandler;
-import mylyn.trello.core.model.BoardList;
-import mylyn.trello.core.model.CardList;
-import mylyn.trello.core.model.User;
+import trello.core.handle.NoConnectionResultHandler;
+import trello.core.model.BoardList;
+import trello.core.model.CardList;
+import trello.core.model.User;
 
 /**
  * Класс предназначен для установки соединения с сайтом trello.com и получения

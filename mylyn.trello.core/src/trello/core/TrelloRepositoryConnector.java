@@ -1,4 +1,4 @@
-package mylyn.trello.core;
+package trello.core;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;

@@ -12,6 +12,6 @@ Require-Bundle: org.eclipse.mylyn.tasks.ui,
  org.eclipse.jdt.annotation,
  org.eclipse.core.runtime,
  org.eclipse.ui.forms,
- mylyn.trello.core,
  mylyn.trello.ui,
- org.eclipse.ui
+ org.eclipse.ui,
+ trello.core

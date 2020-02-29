@@ -1,4 +1,4 @@
-package mylyn.trello.core.model;
+package trello.core.model;
 
 /**
  * Класс необходим для хранения информации о пользователе.

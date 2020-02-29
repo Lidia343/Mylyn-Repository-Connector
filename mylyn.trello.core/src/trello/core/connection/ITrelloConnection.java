@@ -1,10 +1,11 @@
-package mylyn.trello.core.connection;
+package trello.core.connection;
 
 import java.io.IOException;
 import java.util.List;
-import mylyn.trello.core.model.BoardList;
-import mylyn.trello.core.model.CardList;
-import mylyn.trello.core.model.User;
+
+import trello.core.model.BoardList;
+import trello.core.model.CardList;
+import trello.core.model.User;
 
 /**
  * Интерфейс, содержащий методы для установки соединения с сайтом trello.com и

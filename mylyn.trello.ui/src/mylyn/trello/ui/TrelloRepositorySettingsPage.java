@@ -6,7 +6,7 @@ import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.widgets.Composite;
-import mylyn.trello.core.TrelloRepositoryConnector;
+import trello.core.TrelloRepositoryConnector;
 
 public class TrelloRepositorySettingsPage extends AbstractRepositorySettingsPage
 {

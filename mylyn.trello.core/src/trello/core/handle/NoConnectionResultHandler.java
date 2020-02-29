@@ -1,4 +1,4 @@
-package mylyn.trello.core.handle;
+package trello.core.handle;
 
 /**
  * Интерфейс обработчика результата попытки установки соединения с trello.com

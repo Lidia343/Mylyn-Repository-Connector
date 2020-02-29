@@ -10,7 +10,7 @@ import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.NewTaskWizard;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
-import mylyn.trello.core.TrelloRepositoryConnector;
+import trello.core.TrelloRepositoryConnector;
 
 public class TrelloRepositoryConnectorUi extends AbstractRepositoryConnectorUi
 {
