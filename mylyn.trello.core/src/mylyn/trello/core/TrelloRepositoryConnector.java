@@ -45,7 +45,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public @NonNull String getLabel()
 	{
-		return "Trello Repository";
+		return "Trello";
 	}
 
 	@Override
