@@ -24,7 +24,7 @@
          unpack="false"/>
 
    <plugin
-         id="mylyn.trello.core"
+         id="trello.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
