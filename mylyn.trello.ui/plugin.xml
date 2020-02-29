@@ -5,6 +5,13 @@
    		 id="mylyn.trello.repository"
          name="Trello Repository"
          point="org.eclipse.mylyn.tasks.ui.repositories">
+      <connectorUi
+            brandingIcon="icons/icon.jpg"
+            class="mylyn.trello.ui.TrelloRepositoryConnectorUi"
+            id="mylyn.trello.ui.TrelloRepositoryConnectorUi"
+            name="Trello Repository Connector UI"
+            overlayIcon="icons/icon.jpg">
+      </connectorUi>
    </extension>
 
 </plugin>
