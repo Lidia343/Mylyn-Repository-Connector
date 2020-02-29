@@ -4,7 +4,9 @@
    <extension
          point="org.eclipse.mylyn.tasks.ui.repositories">
       <connectorCore
-            class="mylyn.trello.core.TrelloRepositoryConnector">
+            class="mylyn.trello.core.TrelloRepositoryConnector"
+            id="mylyn.trello.core.TrelloRepositoryConnector"
+            name="Trello Repository Connector">
       </connectorCore>
    </extension>
 
