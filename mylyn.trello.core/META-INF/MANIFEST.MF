@@ -10,4 +10,4 @@ Require-Bundle: com.google.gson,
  org.eclipse.mylyn.tasks.core,
  org.eclipse.core.runtime,
  org.eclipse.jdt.annotation
-Export-Package: mylyn.trello.core
+Export-Package: mylyn.trello.core.connection, mylyn.trello.core.handle, mylyn.trello.core.model, mylyn.trello.core
