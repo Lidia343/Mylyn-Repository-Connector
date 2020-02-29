@@ -11,9 +11,9 @@ import org.eclipse.mylyn.tasks.ui.wizards.ITaskRepositoryPage;
 import org.eclipse.mylyn.tasks.ui.wizards.NewTaskWizard;
 import org.eclipse.mylyn.tasks.ui.wizards.RepositoryQueryWizard;
 
-public class TrelloRepositoryConnectorUi //extends AbstractRepositoryConnectorUi
+public class TrelloRepositoryConnectorUi extends AbstractRepositoryConnectorUi
 {
-	/*@Override
+	@Override
 	public @NonNull String getConnectorKind()
 	{
 		return TrelloRepositoryConnector.CONNECTOR_KIND;
@@ -42,5 +42,5 @@ public class TrelloRepositoryConnectorUi //extends AbstractRepositoryConnectorUi
 	public boolean hasSearchPage()
 	{
 		return false;
-	}*/
+	}
 }

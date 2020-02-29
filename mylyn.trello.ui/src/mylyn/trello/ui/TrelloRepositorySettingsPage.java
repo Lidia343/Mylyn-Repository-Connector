@@ -7,9 +7,9 @@ import org.eclipse.mylyn.tasks.ui.AbstractRepositoryConnectorUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.widgets.Composite;
 
-public class TrelloRepositorySettingsPage //extends AbstractRepositorySettingsPage
+public class TrelloRepositorySettingsPage extends AbstractRepositorySettingsPage
 {
-	/*public TrelloRepositorySettingsPage(String a_title, String a_description,
+	public TrelloRepositorySettingsPage(String a_title, String a_description,
 		   TaskRepository a_taskRepository, AbstractRepositoryConnector a_connector,
 		   AbstractRepositoryConnectorUi a_connectorUi)
 	{
@@ -25,5 +25,5 @@ public class TrelloRepositorySettingsPage //extends AbstractRepositorySettingsPa
 	public String getConnectorKind()
 	{
 		return TrelloRepositoryConnector.CONNECTOR_KIND;
-	}*/
+	}
 }
