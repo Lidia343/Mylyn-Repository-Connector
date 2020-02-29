@@ -16,7 +16,7 @@ import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
-	public final static String CONNECTOR_KIND = "REST";
+	public final static String CONNECTOR_KIND = "trello";
 	
 	@Override
 	public boolean canCreateNewTask(@NonNull TaskRepository a_taskRepository)
