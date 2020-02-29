@@ -11,8 +11,8 @@ import mylyn.trello.core.TrelloRepositoryConnector;
 public class TrelloRepositorySettingsPage extends AbstractRepositorySettingsPage
 {
 	public TrelloRepositorySettingsPage(String a_title, String a_description,
-		   TaskRepository a_taskRepository, AbstractRepositoryConnector a_connector,
-		   AbstractRepositoryConnectorUi a_connectorUi)
+		                                TaskRepository a_taskRepository, AbstractRepositoryConnector a_connector,
+		                                AbstractRepositoryConnectorUi a_connectorUi)
 	{
 		super(a_title, a_description, a_taskRepository, a_connector, a_connectorUi);
 	}

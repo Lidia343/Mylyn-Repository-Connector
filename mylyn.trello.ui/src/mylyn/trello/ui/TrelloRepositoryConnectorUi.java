@@ -36,7 +36,7 @@ public class TrelloRepositoryConnectorUi extends AbstractRepositoryConnectorUi
 	@Override
 	public @NonNull ITaskRepositoryPage getSettingsPage(@Nullable TaskRepository a_taskRepository)
 	{
-		return new TrelloRepositorySettingsPage("Settings", "Description", a_taskRepository, new TrelloRepositoryConnector(), this);
+		return new TrelloRepositorySettingsPage("Repository settings", "Enter a valid server url", a_taskRepository, new TrelloRepositoryConnector(), this);
 	}
 
 	@Override
