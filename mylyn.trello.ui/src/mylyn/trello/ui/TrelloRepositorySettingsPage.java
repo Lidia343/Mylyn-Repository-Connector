@@ -18,7 +18,7 @@ public class TrelloRepositorySettingsPage extends AbstractRepositorySettingsPage
 	}
 
 	@Override
-	protected void createAdditionalControls(@NonNull Composite a_arg0)
+	protected void createAdditionalControls(@NonNull Composite a_composite)
 	{
 	}
 
