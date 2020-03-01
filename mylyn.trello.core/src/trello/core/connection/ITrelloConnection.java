@@ -24,7 +24,7 @@ public interface ITrelloConnection
 	 * @return объект класса User, содержащий информацию о пользователе
 	 * @throws IOException
 	 */
-	User connectAndGetUserData(String a_key, String a_token) throws Exception;
+	User getUserData() throws Exception;
 
 	/**
 	 * Метод для получения списка досок.
