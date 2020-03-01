@@ -9,7 +9,8 @@ Require-Bundle: com.google.gson,
  org.eclipse.mylyn.tasks.ui,
  org.eclipse.mylyn.tasks.core,
  org.eclipse.core.runtime,
- org.eclipse.jdt.annotation
+ org.eclipse.jdt.annotation,
+ org.eclipse.swt
 Export-Package: trello.core,
  trello.core.connection,
  trello.core.handle,
