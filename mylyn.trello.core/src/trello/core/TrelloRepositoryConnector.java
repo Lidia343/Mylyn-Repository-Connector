@@ -1,5 +1,6 @@
 package trello.core;
 
+//import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -14,15 +15,17 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
+//import trello.core.connection.TrelloConnection;
+import trello.core.connection.TrelloConnectionImit;
+import trello.core.handle.NoConnectionResultHandler;
+import trello.core.model.Board;
+import trello.core.model.BoardList;
+import trello.core.model.Card;
+import trello.core.model.CardList;
 
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
 	public final static String CONNECTOR_KIND = "trello";
-
-	public TrelloRepositoryConnector()
-	{
-		
-	}
 
 	@Override
 	public boolean canCreateNewTask(@NonNull TaskRepository a_repository)
@@ -51,21 +54,58 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public @Nullable String getRepositoryUrlFromTaskUrl(@NonNull String a_taskUrl)
 	{
-		return "api.trello.com";
+		String repositoryUrlEnd = ".com/";
+		int index = a_taskUrl.indexOf(repositoryUrlEnd);
+		return a_taskUrl.substring(0, index + repositoryUrlEnd.length());
 	}
 
 	@Override
 	public @Nullable String getTaskIdFromTaskUrl(@NonNull String a_taskUrl)
 	{
-		return null;
+		return getTaskIdOrUrl(true, a_taskUrl);
 	}
 
 	@Override
 	public @Nullable String getTaskUrl(@NonNull String a_repositoryUrl, @NonNull String a_taskIdOrKey)
 	{
-		return null;
+		return getTaskIdOrUrl(false, a_taskIdOrKey);
 	}
 
+	private String getTaskIdOrUrl (boolean a_isId, String a_idOrUrl)
+	{
+		TrelloConnectionImit connection = new TrelloConnectionImit("1c8962f69eea55f6346aacabf4b9d90e", "f51cede3da475d589f56dc510ce4292bd4bcae622d1cca92e75821309cef697f");//Тестовая реализация
+		try
+		{
+			BoardList boardList = connection.getBoardList();
+			for (Board b : boardList.getBoards())
+			{
+				for (CardList l : b.getCardLists())
+				{
+					for (Card c : l.getCards())
+					{
+						if (a_isId)
+						{
+							if (c.getUrl().equals(a_idOrUrl))
+							{
+								return c.getId();
+							}
+						}
+						else
+						if (c.getId().equals(a_idOrUrl))
+						{
+							return c.getUrl();
+						}
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			NoConnectionResultHandler.createMessage(e.getMessage());
+		}
+		return null;
+	}
+	
 	@Override
 	public boolean hasTaskChanged(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
