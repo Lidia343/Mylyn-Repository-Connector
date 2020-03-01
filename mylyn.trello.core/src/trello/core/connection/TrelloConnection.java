@@ -9,7 +9,6 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import trello.core.handle.NoConnectionResultHandler;
 import trello.core.model.BoardList;
 import trello.core.model.CardList;
@@ -22,29 +21,20 @@ import trello.core.model.User;
  */
 public class TrelloConnection implements ITrelloConnection
 {
-	private NoConnectionResultHandler	m_noConHandler;
-	private String						m_mainUrlPart	= "https://api.trello.com/1/";
-	private Gson						m_gson;
-	private String						m_key;
-	private String						m_token;
+	private String m_key;
+	private String m_token;
+	private String m_mainUrlPart = "https://api.trello.com/1/";
+	private Gson m_gson = (new GsonBuilder().create());
 
-	/**
-	 * Конструктор класса TrelloConnection.
-	 * 
-	 * @param a_noConHandler
-	 *            - обработчик результата попытки установки соединения с
-	 *            trello.com (при отсутствии подключения)
-	 */
-	public TrelloConnection(NoConnectionResultHandler a_noConHandler)
-	{
-		m_noConHandler = a_noConHandler;
-		m_gson = (new GsonBuilder().create());
-	}
-
-	public User connectAndGetUserData(String a_key, String a_token) throws IOException
+	public TrelloConnection(String a_key, String a_token)
 	{
 		m_key = a_key;
 		m_token = a_token;
+	}
+	
+	@Override
+	public User getUserData() throws IOException
+	{
 		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart
 				+ "members/me?fields=fullName,username,email&key=" + m_key + "&token=" + m_token);
 		User user = null;
@@ -53,6 +43,7 @@ public class TrelloConnection implements ITrelloConnection
 		return user;
 	}
 
+	@Override
 	public BoardList getBoardList() throws IOException
 	{
 		String line = connectByUrlAndGetResponse("GET",
@@ -63,7 +54,8 @@ public class TrelloConnection implements ITrelloConnection
 			boardList = m_gson.fromJson(line, BoardList.class);
 		return boardList;
 	}
-
+	
+	@Override
 	public List<CardList> getCardLists(String a_boardId) throws IOException
 	{
 		String line = connectByUrlAndGetResponse("GET",
@@ -98,12 +90,12 @@ public class TrelloConnection implements ITrelloConnection
 		int responseCode = connection.getResponseCode();
 		if(responseCode >= 400 && responseCode < 500)
 		{
-			m_noConHandler.createMessage("Ошибка клиента");
+			NoConnectionResultHandler.createMessage("Ошибка клиента");
 			return null;
 		}
 		if(responseCode >= 500)
 		{
-			m_noConHandler.createMessage("Ошибка сервера");
+			NoConnectionResultHandler.createMessage("Ошибка сервера");
 			return null;
 		}
 		try(BufferedReader bufferedReader = new BufferedReader(

@@ -14,13 +14,13 @@ public class TrelloConnectionImit implements ITrelloConnection
 {
 	TrelloImitDataStorage dataStorage;
 
-	public TrelloConnectionImit()
+	public TrelloConnectionImit(String a_key, String a_token)
 	{
 		dataStorage = new TrelloImitDataStorage();
 	}
 
 	@Override
-	public User connectAndGetUserData(String a_key, String a_token) throws Exception
+	public User getUserData() throws Exception
 	{
 		return dataStorage.getUser();
 	}
