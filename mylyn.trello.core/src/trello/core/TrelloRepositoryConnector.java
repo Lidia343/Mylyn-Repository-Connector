@@ -1,6 +1,5 @@
 package trello.core;
 
-//import java.io.IOException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -15,8 +14,8 @@ import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
-//import trello.core.connection.TrelloConnection;
 import trello.core.connection.TrelloConnectionImit;
+import trello.core.handle.INoConnectionResultHandler;
 import trello.core.handle.NoConnectionResultHandler;
 import trello.core.model.Board;
 import trello.core.model.BoardList;
@@ -73,6 +72,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 
 	private String getTaskIdOrUrl (boolean a_isId, String a_idOrUrl)
 	{
+		INoConnectionResultHandler handler = new NoConnectionResultHandler();
 		TrelloConnectionImit connection = new TrelloConnectionImit("1c8962f69eea55f6346aacabf4b9d90e", "f51cede3da475d589f56dc510ce4292bd4bcae622d1cca92e75821309cef697f");//Тестовая реализация
 		try
 		{
@@ -101,7 +101,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		}
 		catch(Exception e)
 		{
-			NoConnectionResultHandler.createMessage(e.getMessage());
+			handler.createMessage(e.getMessage());
 		}
 		return null;
 	}
@@ -115,7 +115,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public void updateTaskFromTaskData(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
-
+		
 	}
 
 	@Override
@@ -136,6 +136,5 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public void updateRepositoryConfiguration(@NonNull TaskRepository a_taskRepository, IProgressMonitor a_monitor) throws CoreException
 	{
-		
 	}
 }
