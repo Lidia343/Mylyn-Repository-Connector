@@ -9,7 +9,6 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import trello.core.handle.NoConnectionResultHandler;
 import trello.core.model.BoardList;
 import trello.core.model.CardList;
 import trello.core.model.User;
@@ -35,8 +34,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public User getUserData() throws IOException
 	{
-		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart
-				+ "members/me?fields=fullName,username,email&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "members/me?fields=fullName,username,email&key=" + m_key + "&token=" + m_token);
 		User user = null;
 		if(line != null)
 			user = m_gson.fromJson(line, User.class);
@@ -46,9 +44,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public BoardList getBoardList() throws IOException
 	{
-		String line = connectByUrlAndGetResponse("GET",
-				m_mainUrlPart + "members/me?fields=none&boards=all&board_fields=name,url&key="
-						+ m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "members/me?fields=none&boards=all&board_fields=name,url&key=" + m_key + "&token=" + m_token);
 		BoardList boardList = null;
 		if(line != null)
 			boardList = m_gson.fromJson(line, BoardList.class);
@@ -58,30 +54,22 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public List<CardList> getCardLists(String a_boardId) throws IOException
 	{
-		String line = connectByUrlAndGetResponse("GET",
-				m_mainUrlPart + "boards/" + a_boardId
-						+ "/lists?cards=open&card_fields=name,desc,url&fields=name&key=" + m_key
-						+ "&token=" + m_token);
+		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "boards/" + a_boardId + "/lists?cards=open&card_fields=name,desc,url&fields=name&key=" 
+				                                 + m_key + "&token=" + m_token);
 		List<CardList> cardLists = null;
 		if(line != null)
-			cardLists = m_gson.fromJson(line, new TypeToken<List<CardList>>()
-				{
-				}.getType());
+			cardLists = m_gson.fromJson(line, new TypeToken<List<CardList>>(){}.getType());
 		return cardLists;
 	}
 
 	/**
 	 * Метод для отправки запроса с помощью URL.
-	 * 
-	 * @param a_requestMethod
-	 *            - тип запроса
-	 * @param a_url
-	 *            - URL запроса
+	 * @param a_requestMethod - тип запроса
+	 * @param a_url - URL запроса
 	 * @return строку, содержащую ответ в формате JSON
 	 * @throws IOException
 	 */
-	private String connectByUrlAndGetResponse(String a_requestMethod, String a_url)
-			throws IOException
+	private String connectByUrlAndGetResponse(String a_requestMethod, String a_url) throws IOException
 	{
 		URL userDataURL = new URL(a_url);
 		HttpURLConnection connection = (HttpURLConnection) userDataURL.openConnection();
@@ -90,16 +78,13 @@ public class TrelloConnection implements ITrelloConnection
 		int responseCode = connection.getResponseCode();
 		if(responseCode >= 400 && responseCode < 500)
 		{
-			NoConnectionResultHandler.createMessage("Ошибка клиента");
-			return null;
+			throw new IOException("Ошибка клиента");
 		}
 		if(responseCode >= 500)
 		{
-			NoConnectionResultHandler.createMessage("Ошибка сервера");
-			return null;
+			throw new IOException("Ошибка сервера");
 		}
-		try(BufferedReader bufferedReader = new BufferedReader(
-				new InputStreamReader(connection.getInputStream())))
+		try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream())))
 		{
 			StringBuilder builder = new StringBuilder();
 			String line;

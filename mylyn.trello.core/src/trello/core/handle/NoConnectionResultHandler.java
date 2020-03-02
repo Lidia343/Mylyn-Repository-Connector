@@ -6,19 +6,16 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Абстрактный класс обработчика результата попытки установки соединения с trello.com
+ * Класс обработчика результата попытки установки соединения с trello.com
  * (при отсутствии подключения).
  */
-public abstract class NoConnectionResultHandler
+public class NoConnectionResultHandler implements INoConnectionResultHandler
 {
-	private static Display display;
-	private static Shell shell;
+	private Display display;
+	private Shell shell;
 	
-	/**
-	 * Метод для создания окна с сообщением пользователю.
-	 * @param a_message - сообщение
-	 */
-	public static void createMessage(String a_message)
+	@Override
+	public void createMessage(String a_message)
 	{
 		display = new Display();
 		shell = new Shell(display);
