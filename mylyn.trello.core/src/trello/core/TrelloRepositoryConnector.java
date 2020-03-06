@@ -25,6 +25,7 @@ import trello.core.model.CardList;
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
 	public final static String CONNECTOR_KIND = "trello";
+	public final static String REPOSITORY_URL = "https://trello.com";
 
 	@Override
 	public boolean canCreateNewTask(@NonNull TaskRepository a_repository)
@@ -115,7 +116,6 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public void updateTaskFromTaskData(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
-		
 	}
 
 	@Override
