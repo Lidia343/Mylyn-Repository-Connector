@@ -14,7 +14,6 @@ import trello.core.TrelloRepositoryConnector;
 
 public class TrelloRepositoryConnectorUi extends AbstractRepositoryConnectorUi
 {
-	
 	@Override
 	public @NonNull String getConnectorKind()
 	{
@@ -37,7 +36,7 @@ public class TrelloRepositoryConnectorUi extends AbstractRepositoryConnectorUi
 	@Override
 	public @NonNull ITaskRepositoryPage getSettingsPage(@Nullable TaskRepository a_taskRepository)
 	{
-		return new TrelloRepositorySettingsPage("Repository settings", "Enter a valid server url", a_taskRepository, getConnector(), this);
+		return new TrelloRepositorySettingsPage("Repository settings", "Example: " + TrelloRepositoryConnector.REPOSITORY_URL, a_taskRepository, getConnector());
 	}
 
 	@Override
