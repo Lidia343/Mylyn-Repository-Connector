@@ -1,7 +1,6 @@
-package mylyn.trello.ui;
+package mylyn.trello.ui.wizard;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.events.FocusAdapter;
@@ -14,10 +13,13 @@ import trello.core.TrelloRepositoryConnector;
 
 public class TrelloRepositorySettingsPage extends AbstractRepositorySettingsPage
 {
-	public TrelloRepositorySettingsPage(String a_title, String a_description,
-		                                TaskRepository a_taskRepository, AbstractRepositoryConnector a_connector)
+	private static final String TITLE = "Repository settings";
+
+	private static final String DESCRIPTION = "Example: " + TrelloRepositoryConnector.REPOSITORY_URL;
+	
+	public TrelloRepositorySettingsPage(TaskRepository a_taskRepository)
 	{
-		super(a_title, a_description, a_taskRepository, a_connector);
+		super(TITLE, DESCRIPTION, a_taskRepository);
 	}
 	
 	private void setRepositoryLabel()
