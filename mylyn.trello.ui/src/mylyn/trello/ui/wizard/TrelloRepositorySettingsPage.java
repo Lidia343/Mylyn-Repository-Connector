@@ -8,7 +8,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-
 import trello.core.TrelloRepositoryConnector;
 
 public class TrelloRepositorySettingsPage extends AbstractRepositorySettingsPage
