@@ -26,6 +26,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
 	public final static String CONNECTOR_KIND = "trello";
 	public final static String REPOSITORY_URL = "https://trello.com";
+	public final static String REPOSITORY_LABEL = "Trello.com";
 
 	@Override
 	public boolean canCreateNewTask(@NonNull TaskRepository a_repository)
