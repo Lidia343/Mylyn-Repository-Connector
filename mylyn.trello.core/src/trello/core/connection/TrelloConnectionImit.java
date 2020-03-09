@@ -39,7 +39,13 @@ public class TrelloConnectionImit implements ITrelloConnection
 	}
 	
 	@Override
-	public Card getCard(String a_cardId)
+	public Card getCardById(String a_cardId)
+	{
+		return dataStorage.getCardLists(TrelloImitDataStorage.boardIds[0]).get(0).getCards().get(0);
+	}
+	
+	@Override
+	public Card getCardByUrl(String a_cardUrl)
 	{
 		return dataStorage.getCardLists(TrelloImitDataStorage.boardIds[0]).get(0).getCards().get(0);
 	}

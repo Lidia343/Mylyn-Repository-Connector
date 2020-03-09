@@ -9,6 +9,8 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
@@ -99,12 +101,29 @@ public class TrelloConnection implements ITrelloConnection
 	}
 	
 	@Override
-	public Card getCard(String a_cardId) throws IOException
+	public Card getCardById(String a_cardId) throws IOException
 	{
 		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "cards/" + a_cardId + "?fields=name,desc,url&key=" + m_key + "&token=" + m_token);
 		Card card = null;
 		if(line != null)
 			card = m_gson.fromJson(line, Card.class);
 		return card;
+	}
+	
+	@Override
+	public Card getCardByUrl(String a_cardUrl) throws IOException
+	{
+		for (Board b : getBoardList().getBoards())
+		{
+			for (CardList l : getCardLists(b.getId()))
+			{
+				for (Card c : l.getCards())
+				{
+					if (c.getUrl().equals(a_cardUrl))
+						return c;
+				}
+			}
+		}
+		return null;
 	}
 }

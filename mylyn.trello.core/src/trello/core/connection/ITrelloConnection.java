@@ -55,5 +55,12 @@ public interface ITrelloConnection
 	 * @return объект класса Card, соответствующий карточке с указанным id
 	 * @throws Exception 
 	 */
-	Card getCard(String a_cardId) throws Exception;
+	Card getCardById(String a_cardId) throws Exception;
+	
+	/**
+	 * @param a_cardUrl - URL карточки
+	 * @return объект класса Card, соответствующий карточке с указанным URL
+	 * @throws Exception 
+	 */
+	Card getCardByUrl(String a_cardUrl) throws Exception;
 }
