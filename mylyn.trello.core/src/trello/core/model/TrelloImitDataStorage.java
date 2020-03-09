@@ -13,7 +13,7 @@ public class TrelloImitDataStorage
 	private User			user;
 	private BoardList		boardList;
 
-	private final String[]	boardIds	= { "5e401943376hk65477b36237",
+	public static final String[]	boardIds	= { "5e401943376hk65477b36237",
 			"5e4019433654b30377b36237" };
 	private final String[]	boardNames	= { "Главная", "Погода" };
 	private final String[]	boardUrls	= {

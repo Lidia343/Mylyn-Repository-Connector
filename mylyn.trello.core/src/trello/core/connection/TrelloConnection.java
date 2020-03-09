@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import trello.core.model.BoardList;
+import trello.core.model.Card;
 import trello.core.model.CardList;
 import trello.core.model.User;
 
@@ -95,5 +96,15 @@ public class TrelloConnection implements ITrelloConnection
 			connection.disconnect();
 			return builder.toString();
 		}
+	}
+	
+	@Override
+	public Card getCard(String a_cardId) throws IOException
+	{
+		String line = connectByUrlAndGetResponse("GET", m_mainUrlPart + "cards/" + a_cardId + "?fields=name,desc,url&key=" + m_key + "&token=" + m_token);
+		Card card = null;
+		if(line != null)
+			card = m_gson.fromJson(line, Card.class);
+		return card;
 	}
 }
