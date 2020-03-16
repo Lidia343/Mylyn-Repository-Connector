@@ -1,4 +1,3 @@
-package trello.core.util;
 
 public class CardValueProvider
 {
