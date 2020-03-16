@@ -2,6 +2,8 @@ package trello.core;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,7 +17,6 @@ import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
@@ -23,9 +24,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import trello.core.connection.ITrelloConnection;
 import trello.core.connection.TrelloConnection;
-import trello.core.connection.TrelloConnectionImit;
 import trello.core.model.Card;
-import trello.core.model.CardList;
 
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
@@ -94,7 +93,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 
 	private String getTaskIdOrUrl (boolean a_isId, String a_idOrUrl)
 	{
-		TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+		ITrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
 		try
 		{
 			if (a_isId)
@@ -180,22 +179,36 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public IStatus performQuery(@NonNull TaskRepository a_repository, @NonNull IRepositoryQuery a_query, @NonNull TaskDataCollector a_collector, 
 			                    @Nullable ISynchronizationSession a_session, IProgressMonitor a_monitor)
 	{
-		try 
-		{////////////////Validate Settings!!!!!!!!!!!!!!
+		try
+		{
 			a_monitor.beginTask("Main task", IProgressMonitor.UNKNOWN);
-			TrelloConnectionImit client = new TrelloConnectionImit(null, null);
-			for (CardList l : client.getCardLists("5e401943376hk65477b36237"))
+			ITrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+			Map<String, ITask> taskById = new HashMap<String, ITask>();
+			Card temp;
+			for (Card card : client.getAllCards())
 			{
-				for (Card c : l.getCards())
+				TaskData taskData = new TaskData(new TaskAttributeMapper(a_repository), a_repository.getConnectorKind(), a_repository.getRepositoryUrl(), card.getId());
+				taskData.setPartial(true);
+				for (ITask task : a_session.getTasks()) 
 				{
-					TaskData taskData = new TaskData(new TaskAttributeMapper(a_repository), a_repository.getConnectorKind(), a_repository.getRepositoryUrl(), c.getId());
-					taskData.setPartial(true);
-					
-					TaskAttribute attribute = new TaskAttributeMapper(a_repository).createTaskAttachment(taskData);
-					attribute.setValue(c.getId() + ""); //$NON-NLS-1$
-					a_collector.accept(taskData);
+					if (taskById == null)                                                                                                                                                                                                                                                        //if (task.getTaskId() != null && !task.getTaskId().equals("") &&)
+					{
+						taskById = new HashMap<String, ITask>();
+						temp = client.getCardById(task.getTaskId());
+						task.setSummary(temp.getName());
+						//task.setAttribute("description", temp.getDesc());
+						//task.set
+						task.setUrl(temp.getUrl());
+						taskById.put(task.getTaskId(), task);
+					}
 				}
-			}
+				ITask task = taskById.get(card.getId());
+				if (task != null && hasTaskChanged(a_repository, task, taskData)) 
+				{
+					a_session.markStale(task);
+				}
+				a_collector.accept(taskData);
+			}	
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
