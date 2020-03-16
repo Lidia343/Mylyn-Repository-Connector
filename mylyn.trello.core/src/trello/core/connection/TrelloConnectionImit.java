@@ -74,4 +74,11 @@ public class TrelloConnectionImit implements ITrelloConnection
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<Card> getAllCards()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

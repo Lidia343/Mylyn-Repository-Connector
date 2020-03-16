@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,8 +20,8 @@ import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
+import trello.core.model.CardValueProvider;
 import trello.core.model.User;
-import trello.core.util.CardValueProvider;
 
 /**
  * Класс предназначен для установки соединения с сайтом trello.com и получения
@@ -119,20 +120,14 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public Card getCardByUrl(String a_cardUrl) throws IOException
 	{
-		for (Board b : getBoardList().getBoards())
+		for (Card c : getAllCards())
 		{
-			for (CardList l : getCardLists(b.getId()))
-			{
-				for (Card c : l.getCards())
-				{
-					if (c.getUrl().equals(a_cardUrl))
-						return c;
-				}
-			}
+			if (c.getUrl().equals(a_cardUrl))
+				return c;
 		}
 		return null;
 	}
-
+	
 	@Override
 	public String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws IOException
 	{
@@ -155,24 +150,18 @@ public class TrelloConnection implements ITrelloConnection
 	public Set<String> getChangedCards(Set<ITask> a_set) throws IOException
 	{
 		Set<String> result = new HashSet<>();
-		for (Board b : getBoardList().getBoards())
+		for (Card card : getAllCards())
 		{
-			for (CardList l : getCardLists(b.getId()))
+			for (ITask task : a_set)
 			{
-				for (Card card : l.getCards())
+				if (task.getTaskId().equals(card.getId()))
 				{
-					for (ITask task : a_set)
-					{
-						if (task.getTaskId().equals(card.getId()))
-						{
-							if (!areSameAttributes(task, card)) result.add(task.getTaskId());
-							break;
-						}
-					}
+					if (!areSameAttributes(task, card)) result.add(task.getTaskId());
+					break;
 				}
 			}
 		}
-		return null;
+		return result;
 	}
 	
 	private boolean areSameAttributes(ITask a_task, Card a_card)
@@ -182,5 +171,22 @@ public class TrelloConnection implements ITrelloConnection
 		if (!a_task.getSummary().equals(a_card.getDesc())) areSame = false;
 		if (!a_task.getUrl().equals(a_card.getUrl())) areSame = false;
 		return areSame;
+	}
+
+	@Override
+	public List<Card> getAllCards() throws IOException
+	{
+		List<Card> cards = new ArrayList<>();
+		for (Board b : getBoardList().getBoards())
+		{
+			for (CardList l : getCardLists(b.getId()))
+			{
+				for (Card c : l.getCards())
+				{
+					cards.add(c);
+				}
+			}
+		}
+		return cards;
 	}
 }
