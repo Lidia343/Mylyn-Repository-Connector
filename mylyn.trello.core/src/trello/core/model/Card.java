@@ -5,6 +5,9 @@ package trello.core.model;
  */
 public class Card
 {
+	public static final String NAME = "name";
+	public static final String DESC = "desc";
+	public static final String URL = "url";
 	private String	id;
 	private String	name;
 	private String	desc;
