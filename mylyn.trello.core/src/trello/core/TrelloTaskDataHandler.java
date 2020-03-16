@@ -75,6 +75,6 @@ public class TrelloTaskDataHandler extends AbstractTaskDataHandler
 	@Override
 	public TaskAttributeMapper getAttributeMapper(@NonNull TaskRepository a_repository)
 	{
-		return null;
+		return new TaskAttributeMapper(a_repository);
 	}
 }
