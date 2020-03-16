@@ -93,4 +93,10 @@ public interface ITrelloConnection
 	 * @return набор id изменённых карточек из репозитория Trello
 	 */
 	Set<String> getChangedCards(Set<ITask> oldCards) throws Exception;
+	
+	
+	/**
+	 * @return все карточки из репозитория
+	 */
+	List<Card> getAllCards() throws Exception;
 }
