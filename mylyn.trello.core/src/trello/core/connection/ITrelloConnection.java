@@ -2,6 +2,9 @@ package trello.core.connection;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+
+import org.eclipse.mylyn.tasks.core.ITask;
 
 import trello.core.model.BoardList;
 import trello.core.model.Card;
@@ -17,6 +20,10 @@ public interface ITrelloConnection
 {
 	public static final String DEFAULT_KEY = "1c8962f69eea55f6346aacabf4b9d90e";
 	public static final String DEFAULT_TOKEN = "f51cede3da475d589f56dc510ce4292bd4bcae622d1cca92e75821309cef697f";
+	public static final String POST_METHOD = "POST";
+	public static final String PUT_METHOD = "PUT";
+	public static final String GET_METHOD = "GET";
+	public static final String DELETE_METHOD = "DELETE";
 	
 	/**
 	 * Метод для установки соединения и получения данных о пользователе.
@@ -63,4 +70,27 @@ public interface ITrelloConnection
 	 * @throws Exception 
 	 */
 	Card getCardByUrl(String a_cardUrl) throws Exception;
+	
+	/**
+	 * Метод для изменения свойства карточки.
+	 * @param a_cardId - id карточки
+	 * @param a_attributeName - название свойства
+	 * @param a_attributeValue - значение свойства
+	 * @return новый URL карточки
+	 */
+	String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws Exception;
+	
+	
+	/**
+	 * Метод удаляет карточку из репозитория.
+	 * @param a_cardId - id карточки
+	 */
+	void deleteCard(String a_cardId) throws Exception;
+	
+	
+	/**
+	 * @param oldCards - набор id карточек из локального репозитория
+	 * @return набор id изменённых карточек из репозитория Trello
+	 */
+	Set<String> getChangedCards(Set<ITask> oldCards) throws Exception;
 }

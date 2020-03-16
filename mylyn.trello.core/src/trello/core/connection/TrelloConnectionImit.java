@@ -1,6 +1,9 @@
 package trello.core.connection;
 
 import java.util.List;
+import java.util.Set;
+
+import org.eclipse.mylyn.tasks.core.ITask;
 
 import trello.core.model.BoardList;
 import trello.core.model.Card;
@@ -48,5 +51,27 @@ public class TrelloConnectionImit implements ITrelloConnection
 	public Card getCardByUrl(String a_cardUrl)
 	{
 		return dataStorage.getCardLists(TrelloImitDataStorage.boardIds[0]).get(0).getCards().get(0);
+	}
+
+	@Override
+	public String changeCard(String a_cardId, String a_attributeName, String a_attributeValue)
+	{
+		return null;
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteCard(String a_cardId)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Set<String> getChangedCards(Set<ITask> a_oldCards)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
