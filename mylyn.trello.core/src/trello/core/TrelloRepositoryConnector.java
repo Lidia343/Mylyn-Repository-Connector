@@ -4,19 +4,18 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
+//import org.eclipse.mylyn.tasks.core.ITaskComment;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+//import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
@@ -33,7 +32,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public final static String REPOSITORY_LABEL = "Trello.com";
 	private final TrelloTaskDataHandler m_taskDataHandler = new TrelloTaskDataHandler();
 	
-	private final String taskKeyUpdateDate = "UpdateDate";
+	//private final String taskKeyUpdateDate = "UpdateDate";
 
 	@Override
 	public boolean canCreateNewTask(@NonNull TaskRepository a_repository)
@@ -116,7 +115,8 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		{
 			return mapper.hasChanges(a_task);
 		} 
-		else 
+		return false;
+		/*else 
 		{
 			Date repositoryDate = mapper.getModificationDate();
 			Date localDate = new Date(Long.parseLong(a_task.getAttribute(taskKeyUpdateDate)));
@@ -125,12 +125,13 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 				return false;
 			}
 			return true;
-		}
+		}*/
 	}
 
 	@Override
 	public void updateTaskFromTaskData(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
+		System.out.println("updating");
 		TaskMapper mapper = (TaskMapper)getTaskMapping(a_taskData);
 		mapper.applyTo(a_task);
 		String status = mapper.getStatus();
@@ -189,16 +190,19 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			{
 				TaskData taskData = new TaskData(new TaskAttributeMapper(a_repository), a_repository.getConnectorKind(), a_repository.getRepositoryUrl(), card.getId());
 				taskData.setPartial(true);
+				//ITaskComment taskComment = new Comment(a_repository, null);//taskData.getAttributeMapper().createTaskAttachment(taskData)
+				//taskComment.setText("ghghgh");
+				//TaskAttribute a = taskData.getAttributeMapper().createTaskAttachment(taskData).createAttribute("comment");
+				//taskData.getAttributeMapper().updateTaskComment(taskComment, a);
 				for (ITask task : a_session.getTasks()) 
 				{
+					temp = client.getCardById(task.getTaskId());
+					task.setSummary(temp.getName());
+					task.setUrl(temp.getUrl());
+					task.setOwner(a_repository.getUserName());
 					if (taskById == null)                                                                                                                                                                                                                                                        //if (task.getTaskId() != null && !task.getTaskId().equals("") &&)
 					{
 						taskById = new HashMap<String, ITask>();
-						temp = client.getCardById(task.getTaskId());
-						task.setSummary(temp.getName());
-						//task.setAttribute("description", temp.getDesc());
-						//task.set
-						task.setUrl(temp.getUrl());
 						taskById.put(task.getTaskId(), task);
 					}
 				}
@@ -208,7 +212,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 					a_session.markStale(task);
 				}
 				a_collector.accept(taskData);
-			}	
+			}
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
@@ -222,13 +226,13 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		}
 	}
 	
-	@Override
+	/*@Override
 	public void preSynchronization(ISynchronizationSession a_session, IProgressMonitor a_monitor) throws CoreException 
 	{
 		a_monitor = Policy.monitorFor(a_monitor);
 		try 
 		{
-			a_monitor.beginTask(Messages.TrelloRepositoryConnector_Getting_changed_tasks, IProgressMonitor.UNKNOWN);
+			a_monitor.beginTask("PreSync", IProgressMonitor.UNKNOWN);
 
 			if (!a_session.isFullSynchronization()) 
 			{
@@ -335,7 +339,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			}
 		}
 		return mostRecentTimeStamp;
-	}
+	}*/
 	
 	@Override
 	public void updateRepositoryConfiguration(@NonNull TaskRepository a_taskRepository, IProgressMonitor a_monitor) throws CoreException
