@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +21,6 @@ import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
-import trello.core.model.CardValueProvider;
 import trello.core.model.User;
 
 /**
@@ -32,8 +32,9 @@ public class TrelloConnection implements ITrelloConnection
 {
 	private String m_key;
 	private String m_token;
-	private String m_mainUrlPart = "https://api.trello.com/1/";
+	private final String m_mainUrlPart = "https://api.trello.com/1/";
 	private Gson m_gson = (new GsonBuilder().create());
+	private final String encoding = "UTF-8";
 
 	public TrelloConnection(String a_key, String a_token)
 	{
@@ -132,12 +133,9 @@ public class TrelloConnection implements ITrelloConnection
 	public String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws IOException
 	{
 		connectByUrlAndGetResponse(ITrelloConnection.PUT_METHOD, m_mainUrlPart + "cards/" + a_cardId + 
-	    "?" + a_attributeName + "=" + a_attributeValue + "&key=" + m_key + "&token=" + m_token);
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "/" + a_attributeName + "?key=" + m_key + "&token=" + m_token);
-		CardValueProvider valueProvider = null;
-		if(line != null)
-			valueProvider = m_gson.fromJson(line, CardValueProvider.class);
-		return valueProvider.getValue();
+	    "?" + a_attributeName + "=" + URLEncoder.encode(a_attributeValue, encoding) + "&key=" + m_key + "&token=" + m_token);
+		Card card = getCardById(a_cardId);
+		return card.getUrl();
 	}
 
 	@Override
