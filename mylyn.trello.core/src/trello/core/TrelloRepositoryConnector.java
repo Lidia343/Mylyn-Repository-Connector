@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.mylyn.commons.net.Policy;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -24,6 +27,7 @@ import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import trello.core.connection.ITrelloConnection;
 import trello.core.connection.TrelloConnection;
 import trello.core.model.Card;
+import trello.core.util.TrelloUtil;
 
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
@@ -131,7 +135,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public void updateTaskFromTaskData(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
-		System.out.println("updating");
+		//System.out.println("updating");
 		TaskMapper mapper = (TaskMapper)getTaskMapping(a_taskData);
 		mapper.applyTo(a_task);
 		String status = mapper.getStatus();
@@ -182,12 +186,16 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	{
 		try
 		{
+			//System.out.println(a_query.toString());
 			a_monitor.beginTask("Main task", IProgressMonitor.UNKNOWN);
 			ITrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
 			Map<String, ITask> taskById = new HashMap<String, ITask>();
 			Card temp;
 			for (Card card : client.getAllCards())
 			{
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//showCardInfo(card);
+				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				TaskData taskData = new TaskData(new TaskAttributeMapper(a_repository), a_repository.getConnectorKind(), a_repository.getRepositoryUrl(), card.getId());
 				taskData.setPartial(true);
 				//ITaskComment taskComment = new Comment(a_repository, null);//taskData.getAttributeMapper().createTaskAttachment(taskData)
@@ -226,10 +234,72 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		}
 	}
 	
-	/*@Override
+	private void showCardInfo(Card temp)
+	{
+		System.out.println(temp.getId());
+		System.out.println(temp.getName());
+		System.out.println(temp.getDesc());
+		System.out.println(temp.getUrl());
+		System.out.println(temp.getClosed());
+		System.out.println(temp.getDue());
+		System.out.println(temp.getDueComplete());
+		System.out.println(temp.getDateLastActivity());
+		for (String s : temp.getIdChecklists())
+		{
+			System.out.println(s);
+		}
+		for (String s : temp.getIdMembers())
+		{
+			System.out.println(s);
+		}
+		System.out.println();
+	}
+	
+	@Override
 	public void preSynchronization(ISynchronizationSession a_session, IProgressMonitor a_monitor) throws CoreException 
 	{
-		a_monitor = Policy.monitorFor(a_monitor);
+		try 
+		{
+			System.out.println("!!!!!!!!PreSynchronization!!!!!!!");
+			a_monitor = Policy.monitorFor(a_monitor);
+			a_monitor.beginTask("PreSync", IProgressMonitor.UNKNOWN);
+			
+			if (!a_session.isFullSynchronization()) 
+			{
+				//System.out.println("NoFullSynchronization");
+				return;
+			}
+			
+			if (a_session.getTasks().isEmpty()) 
+			{
+				//System.out.println("EmptyTasks");
+				return;
+			}
+			
+			TaskRepository repository = a_session.getTaskRepository();
+
+			if (repository.getSynchronizationTimeStamp() == null || repository.getSynchronizationTimeStamp().length() == 0) 
+			{
+				//System.out.println("NoTime");
+				for (ITask task : a_session.getTasks()) 
+				{
+					a_session.markStale(task);
+				}
+				return;
+			}
+			
+			Date since = new Date(0);
+			try 
+			{
+				since = TrelloUtil.parseDate(Integer.parseInt(repository.getSynchronizationTimeStamp()));
+			} catch (NumberFormatException e) {}
+			
+			
+		} finally 
+		{
+			a_monitor.done();
+		}
+		/*a_monitor = Policy.monitorFor(a_monitor);
 		try 
 		{
 			a_monitor.beginTask("PreSync", IProgressMonitor.UNKNOWN);
@@ -301,7 +371,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		finally 
 		{
 			a_monitor.done();
-		}
+		}*/
 	}
 	
 	@Override
@@ -309,13 +379,14 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	{
 		try 
 		{
+			System.out.println("!!!!!!!!PostSynchronization!!!!!!!");
 			a_monitor.beginTask("", 1);
 			if (a_event.isFullSynchronization() && a_event.getStatus() == null) 
 			{
 				Date date = getSynchronizationTimestamp(a_event);
 				if (date != null) 
 				{
-					a_event.getTaskRepository().setSynchronizationTimeStamp(Long.toString(date.getTime())); 
+					a_event.getTaskRepository().setSynchronizationTimeStamp(TrelloUtil.toTrelloTime(date) + "");
 				}
 			}
 		} 
@@ -328,7 +399,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	private Date getSynchronizationTimestamp(ISynchronizationSession a_event) 
 	{
 		Date mostRecent = new Date(0);
-		Date mostRecentTimeStamp = new Date (Integer.parseInt(a_event.getTaskRepository().getSynchronizationTimeStamp()));
+		Date mostRecentTimeStamp = TrelloUtil.parseDate(a_event.getTaskRepository().getSynchronizationTimeStamp());
 		for (ITask task : a_event.getChangedTasks()) 
 		{
 			Date taskModifiedDate = task.getModificationDate();
@@ -339,7 +410,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			}
 		}
 		return mostRecentTimeStamp;
-	}*/
+	}
 	
 	@Override
 	public void updateRepositoryConfiguration(@NonNull TaskRepository a_taskRepository, IProgressMonitor a_monitor) throws CoreException
