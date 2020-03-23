@@ -10,20 +10,17 @@ import java.util.List;
  */
 public class TrelloImitDataStorage
 {
-	private User			user;
-	private BoardList		boardList;
+	private User user;
+	private BoardList boardList;
 
-	public static final String[]	boardIds	= { "5e401943376hk65477b36237",
-			"5e4019433654b30377b36237" };
-	private final String[]	boardNames	= { "Главная", "Погода" };
-	private final String[]	boardUrls	= {
-			"https://trello.com/b/UIDPFrBr/%D0%B4%D0%0%D0%BE-%D0%B%82%D1%8C-%D0%B2-trello",
-			"https://trello.com/b/IRTihBr/%D0%B5%BE-%D0%B%8%8C-%D0%B2-trello" };
+	public static final String[] boardIds = {"5e401943376hk65477b36237", "5e4019433654b30377b36237"};
+	private final String[] boardNames = {"Главная", "Погода"};
+	private final String[] boardUrls	= {"https://trello.com/b/UIDPFrBr/%D0%B4%D0%0%D0%BE-%D0%B%82%D1%8C-%D0%B2-trello",
+										   "https://trello.com/b/IRTihBr/%D0%B5%BE-%D0%B%8%8C-%D0%B2-trello"};
+	private final String cardUrl = "https://trello.com/c/Kjt3jSA7/1-%D0%BD%BC%1%80-%D0DBC-%D0%B1D1%8B";
 
-	private final String	cardUrl		= "https://trello.com/c/Kjt3jSA7/1-%D0%BD%BC%1%80-%D0DBC-%D0%B1D1%8B";
-
-	private final int		listCount	= 1;
-	private final int		cardCount	= 3;
+	private final int listCount	= 1;
+	private final int cardCount	= 3;
 
 	/**
 	 * Конструктор класса TrelloImitDataStorage.
@@ -81,7 +78,6 @@ public class TrelloImitDataStorage
 			board.setCardLists(tempList);
 			boards.add(board);
 		}
-
 		boardList.setBoards(boards);
 	}
 
@@ -102,8 +98,7 @@ public class TrelloImitDataStorage
 	}
 
 	/**
-	 * @param a_boardId
-	 *            - id доски
+	 * @param a_boardId - id доски
 	 * @return список списков карточек
 	 */
 	public List<CardList> getCardLists(String a_boardId)
@@ -120,7 +115,6 @@ public class TrelloImitDataStorage
 				return b.getCardLists();
 			}
 		}
-
 		return null;
 	}
 }
