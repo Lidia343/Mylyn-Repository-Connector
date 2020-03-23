@@ -55,7 +55,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public BoardList getBoardList() throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=all&board_fields=name,url&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=all&board_fields=name,url,closed&key=" + m_key + "&token=" + m_token);
 		BoardList boardList = null;
 		if(line != null)
 			boardList = m_gson.fromJson(line, BoardList.class);
@@ -65,7 +65,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public List<CardList> getCardLists(String a_boardId) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?cards=open&card_fields=name,desc,url&fields=name&key=" 
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?cards=open&card_fields=name,desc,url,closed,due,dueComplete,dateLastActivity,idChecklists,idMembers&fields=name,closed&key=" 
 				                                 + m_key + "&token=" + m_token);
 		List<CardList> cardLists = null;
 		if(line != null)
@@ -111,7 +111,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public Card getCardById(String a_cardId) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?fields=name,desc,url&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?fields=name,desc,url,closed,due,dueComplete,dateLastActivity,idChecklists,idMembers&key=" + m_key + "&token=" + m_token);
 		Card card = null;
 		if(line != null)
 			card = m_gson.fromJson(line, Card.class);
