@@ -5,41 +5,14 @@ import java.util.List;
 /**
  * Класс необходим для хранения информации о доске.
  */
-public class Board
+public class Board extends TrelloObject
 {
-	private String			id;
-	private String			name;
-	private String			url;
-	private List<CardList>	cardLists;
+	private String url;
+	private List<CardList> cardLists;
+	private String closed;
 
 	/**
-	 * Конструктор класса Board.
-	 */
-	public Board()
-	{
-	}
-
-	/**
-	 * @param a_id
-	 *            - id доски
-	 */
-	public void setId(String a_id)
-	{
-		id = a_id;
-	}
-
-	/**
-	 * @param a_name
-	 *            - название доски
-	 */
-	public void setName(String a_name)
-	{
-		name = a_name;
-	}
-
-	/**
-	 * @param a_name
-	 *            - url доски
+	 * @param a_url - url доски
 	 */
 	public void setUrl(String a_url)
 	{
@@ -47,8 +20,7 @@ public class Board
 	}
 
 	/**
-	 * @param a_cardLists
-	 *            - списки карточек доски
+	 * @param a_cardLists - списки карточек доски
 	 */
 	public void setCardLists(List<CardList> a_cardLists)
 	{
@@ -56,21 +28,13 @@ public class Board
 	}
 
 	/**
-	 * @return id доски
+	 * @param a_closed - состояние закрыта/открыта доски
 	 */
-	public String getId()
+	public void setClosed(String a_closed)
 	{
-		return id;
+		closed = a_closed;
 	}
-
-	/**
-	 * @return имя доски
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
+	
 	/**
 	 * @return URL доски
 	 */
@@ -85,5 +49,13 @@ public class Board
 	public List<CardList> getCardLists()
 	{
 		return cardLists;
+	}
+	
+	/**
+	 * @return состояние закрыта/открыта доски
+	 */
+	public String getClosed()
+	{
+		return closed;
 	}
 }

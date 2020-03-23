@@ -5,22 +5,12 @@ package trello.core.model;
  */
 public class User
 {
-	private String	fullName;
-	private String	username;
-	private String	email;
+	private String fullName;
+	private String username;
+	private String email;
 
 	/**
-	 * Конструктор класса User.
-	 */
-	public User()
-	{
-	}
-
-	/**
-	 * Метод для установки имени пользователя.
-	 * 
-	 * @param a_fullName
-	 *            - полное имя
+	 * @param a_fullName - полное имя пользователя
 	 */
 	public void setFullName(String a_fullName)
 	{
@@ -28,10 +18,7 @@ public class User
 	}
 
 	/**
-	 * Метод для установки логина пользователя.
-	 * 
-	 * @param a_username
-	 *            - логин
+	 * @param a_username - логин пользователя
 	 */
 	public void setUserName(String a_username)
 	{
@@ -39,10 +26,7 @@ public class User
 	}
 
 	/**
-	 * Метод для установки email-адреса пользователя.
-	 * 
-	 * @param email
-	 *            - email-адрес
+	 * @param email- email-адрес пользователя
 	 */
 	public void setEmail(String a_email)
 	{
@@ -50,8 +34,6 @@ public class User
 	}
 
 	/**
-	 * Метод для возврата полного имени пользователя.
-	 * 
 	 * @return полное имя пользователя
 	 */
 	public String getFullName()
@@ -60,8 +42,6 @@ public class User
 	}
 
 	/**
-	 * Метод для возврата логина пользователя.
-	 * 
 	 * @return логин пользователя
 	 */
 	public String getUsername()
@@ -70,8 +50,6 @@ public class User
 	}
 
 	/**
-	 * Метод для возврата адреса электронной почты пользователя.
-	 * 
 	 * @return адрес электронной почты пользователя
 	 */
 	public String getEmail()

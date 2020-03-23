@@ -7,22 +7,13 @@ import java.util.List;
  */
 public class CardList
 {
-	private String		name;
-	private List<Card>	cards;
-	private String		boardId;
+	private String name;
+	private List<Card> cards;
+	private String boardId;
+	private String closed;
 
 	/**
-	 * Конструктор класса CardList.
-	 */
-	public CardList()
-	{
-	}
-
-	/**
-	 * Метод для установки названия списка карточек.
-	 * 
-	 * @param a_name
-	 *            - название
+	 * @param a_name - название списка карточек
 	 */
 	public void setName(String a_name)
 	{
@@ -30,10 +21,7 @@ public class CardList
 	}
 
 	/**
-	 * Метод для установки списка карточек.
-	 * 
-	 * @param a_cards
-	 *            - список карточек
+	 * @param a_cards - список карточек
 	 */
 	public void setCards(List<Card> a_cards)
 	{
@@ -41,10 +29,7 @@ public class CardList
 	}
 
 	/**
-	 * Метод для установки id доски, которой принадлежит список.
-	 * 
-	 * @param a_boardId
-	 *            - id доски
+	 * @param a_boardId - id доски
 	 */
 	public void setBoardId(String a_boardId)
 	{
@@ -52,9 +37,15 @@ public class CardList
 	}
 
 	/**
-	 * Метод для возврата имени списка.
-	 * 
-	 * @return имя списка
+	 * @param a_closed - состояние закрыт/открыт списка карточек
+	 */
+	public void setClosed(String a_closed)
+	{
+		closed = a_closed;
+	}
+	
+	/**
+	 * @return имя списка карточек
 	 */
 	public String getName()
 	{
@@ -62,8 +53,6 @@ public class CardList
 	}
 
 	/**
-	 * Метод для возврата списка карточек
-	 * 
 	 * @return список карточек
 	 */
 	public List<Card> getCards()
@@ -71,13 +60,19 @@ public class CardList
 		return cards;
 	}
 
-	/**
-	 * Метод для возврата id доски, которой принадлежит список.
-	 * 
-	 * @return id доски
+	/** 
+	 * @return id доски, которой принадлежит список
 	 */
 	public String getBoardId()
 	{
 		return boardId;
+	}
+	
+	/**
+	 * @return состояние закрыт/открыт списка карточек
+	 */
+	public String getClosed()
+	{
+		return closed;
 	}
 }

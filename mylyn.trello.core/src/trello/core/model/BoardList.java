@@ -10,17 +10,7 @@ public class BoardList
 	private List<Board> boards;
 
 	/**
-	 * Конструктор класса BoardList.
-	 */
-	public BoardList()
-	{
-	}
-
-	/**
-	 * Метод для установки списка досок
-	 * 
-	 * @param a_boards
-	 *            - список досок
+	 * @param a_boards - список досок
 	 */
 	public void setBoards(List<Board> a_boards)
 	{
@@ -28,8 +18,6 @@ public class BoardList
 	}
 
 	/**
-	 * Метод для возврата списка досок.
-	 * 
 	 * @return список досок
 	 */
 	public List<Board> getBoards()
