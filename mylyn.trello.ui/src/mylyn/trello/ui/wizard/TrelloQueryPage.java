@@ -1,5 +1,9 @@
 package mylyn.trello.ui.wizard;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.mylyn.commons.workbench.forms.SectionComposite;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
@@ -12,6 +16,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+
+import trello.core.connection.ITrelloConnection;
+import trello.core.connection.TrelloConnection;
+import trello.core.model.Board;
+import trello.core.model.CardList;
+import trello.core.model.User;
 
 public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 {
@@ -83,6 +93,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private Button m_checkListMovingButton;
 	
+	private List<Board> m_allBoards;
+	private List<User> m_allMembers;
+	private List<CardList> m_allLists;
+	
 	public TrelloQueryPage(TaskRepository a_repository, IRepositoryQuery a_query)
 	{
 		super(PAGE_NAME, a_repository, a_query);
@@ -94,7 +108,86 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	@Override
 	protected void doRefreshControls()
 	{
-		
+		try
+		{
+			String oldBoardId = "";
+			String oldBoardName = "";
+			
+			String oldMemberEmail = "";
+			String oldMemberName = "";
+			
+			String oldListId = "";
+			String oldListName = "";
+			
+			if (m_allBoards != null)
+			{
+				Board oldBoard = m_allBoards.get(m_suggestedBoardsCombo.indexOf(m_suggestedBoardsCombo.getText()));
+				oldBoardId = oldBoard.getId();
+				oldBoardName = oldBoard.getName();
+				
+				if (m_allMembers != null)
+				{
+					User oldMember = m_allMembers.get(m_suggestedMembersCombo.indexOf(m_suggestedMembersCombo.getText()));
+					oldMemberEmail = oldMember.getEmail();
+					oldMemberName = oldMember.getFullName();
+				}
+				if (m_allLists != null)
+				{
+					CardList oldList = m_allLists.get(m_suggestedListsCombo.indexOf(m_suggestedListsCombo.getText()));
+					oldListId = oldList.getId();
+					oldListName = oldList.getName();
+				}
+			}
+			
+			m_suggestedBoardsCombo.removeAll();
+			m_suggestedBoardsCombo.setText("");
+			
+			m_suggestedMembersCombo.removeAll();
+			m_suggestedMembersCombo.setText(m_defaultTrelloObjectSelectionText);
+			
+			m_suggestedListsCombo.removeAll();
+			m_suggestedListsCombo.setText(m_defaultTrelloObjectSelectionText);
+			
+			TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+			m_allBoards = client.getBoardList().getBoards();
+			if (m_allBoards == null) return;
+			
+			//List<User> members
+			
+			for (Board b : m_allBoards)
+			{
+				m_suggestedBoardsCombo.add(b.getName());
+				if (oldBoardId.length() > 0)
+					if (b.getId().equals(oldBoardId)) 
+					{
+						m_suggestedBoardsCombo.setText(oldBoardName);
+						m_allMembers = client.getMembers(b.getId());
+						m_allLists = client.getCardLists(b.getId());
+						for (User m : m_allMembers)
+						{
+							m_suggestedMembersCombo.add(m.getFullName());
+							if (m.getEmail().equals(oldMemberEmail))
+							{
+								m_suggestedMembersCombo.setText(oldMemberName);
+							}
+						}
+						for (CardList l : m_allLists)
+						{
+							m_suggestedListsCombo.add(l.getName());
+							if (l.getId().equals(oldListId))
+							{
+								m_suggestedListsCombo.setText(oldListName);
+							}
+						}
+					}
+			}
+			m_allMembers = client.getMembers(m_allBoards.get(m_suggestedBoardsCombo.indexOf(m_suggestedBoardsCombo.getText())).getId());
+			m_allLists = client.getCardLists(m_allBoards.get(m_suggestedBoardsCombo.indexOf(m_suggestedBoardsCombo.getText())).getId());
+		}
+		catch(IOException e)
+		{
+			setMessage(e.getMessage());
+		}
 	}
 
 	@Override
@@ -190,8 +283,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_baseComposite.setLayoutData(g);
 		createGridLayout(m_baseComposite, 5, false);
 		
-		createMemberGroup();
 		createBoardGroup();
+		createMemberGroup();
 		createListGroup();
 		
 		m_archivedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
