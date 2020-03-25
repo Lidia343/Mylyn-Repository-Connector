@@ -51,13 +51,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private Button m_closedBoardsButton;
 	private Button m_closedListsButton;
 	
-	private Button m_nonArchivedCardsButton;
-	private Button m_bothArchivedCardsButton;
-	private Button m_onlyArchivedCardsButton;
-	
-	private Button m_nonCompletedCardsButton;
-	private Button m_bothCompletedCardsButton;
-	private Button m_onlyCompletedCardsButton;
+	private Combo m_archivedCardSelections;
+	private Combo m_completedCardSelections;
 
 	private Combo m_dueDate;
 	
@@ -154,6 +149,29 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_closedListsButton.setText("See also archived lists");
 	}
 	
+	private void setGroup(Label a_groupLabel, String a_name, Combo a_linesForSelect, Combo a_fieldLines, Combo a_selectedLines, Button a_cleaning, String[] a_fieldsForAdding)
+	{
+		a_groupLabel.setText(a_name);
+		GridData g = createGridData (SWT.RIGHT, false, 0);
+		a_groupLabel.setLayoutData(g);
+		
+		g = createGridData (SWT.FILL, true, 0);
+		a_linesForSelect.setLayoutData(g);
+		a_linesForSelect.add("All if they exist");
+		a_linesForSelect.setText("All if they exist");
+		
+		g = createGridData (SWT.FILL, true, 0);
+		a_fieldLines.setLayoutData(g);
+		
+		g = createGridData (SWT.FILL, true, 0);
+		a_selectedLines.setLayoutData(g);
+		
+		g = createGridData (SWT.LEFT, false, 0);
+		a_cleaning.setLayoutData(g);
+		a_cleaning.setText("Clear list");
+		addFieldsAndSetText(a_fieldLines, a_fieldsForAdding, a_fieldsForAdding[0]);
+	}
+	
 	private void addFieldsAndSetText(Combo combo, String[] fields, String text)
 	{
 		if (combo == null) return;
@@ -167,96 +185,42 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private void createMemberGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		groupLabel.setText("Members:");
-		GridData g = createGridData (SWT.RIGHT, false, 0);
-		groupLabel.setLayoutData(g);
-		
 		m_membersForSelect = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_membersForSelect.setLayoutData(g);
-		m_membersForSelect.add("All if they exist");
-		m_membersForSelect.setText("All if they exist");
-		
 		m_memberFields = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_memberFields.setLayoutData(g);
-		
 		m_selectedMembers = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_selectedMembers.setLayoutData(g);
-		
 		m_memberClearing = new Button (m_baseComposite, SWT.PUSH);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_memberClearing.setLayoutData(g);
-		m_memberClearing.setText("Clear list");
-		if (m_memberFields != null) 
-		{
-			addFieldsAndSetText(m_memberFields, new String [] {"FullName:", "Username:", "Email:"}, "FullName:");
-		}
+		setGroup(groupLabel, "Members:", m_membersForSelect, m_memberFields, m_selectedMembers, m_memberClearing, new String [] {"FullName:", "Username:", "Email:"});
 	}
 	
 	private void createBoardGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		groupLabel.setText("Boards:");
-		GridData g = createGridData (SWT.RIGHT, false, 0);
-		groupLabel.setLayoutData(g);
-		
 		m_boardsForSelect = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_boardsForSelect.setLayoutData(g);
-		m_boardsForSelect.add("All if they exist");
-		m_boardsForSelect.setText("All if they exist");
-		
 		m_boardFields = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_boardFields.setLayoutData(g);
-		
 		m_selectedBoards = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_selectedBoards.setLayoutData(g);
-		
 		m_boardClearing = new Button (m_baseComposite, SWT.PUSH);
-		g = createGridData (SWT.RIGHT, false, 0);
-		m_boardClearing.setLayoutData(g);
-		m_boardClearing.setText("Clear list");
-		
-		if (m_boardFields != null) 
-		{
-			addFieldsAndSetText(m_boardFields, new String [] {"Name:", "URL:", "ID:"}, "Name:");
-		}
+		setGroup(groupLabel, "Boards:", m_boardsForSelect, m_boardFields, m_selectedBoards, m_boardClearing, new String [] {"Name:", "URL:", "ID:"});
 	}
 	
 	private void createListGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		groupLabel.setText("Lists:");
-		GridData g = createGridData (SWT.RIGHT, false, 0);
-		groupLabel.setLayoutData(g);
-		
 		m_listsForSelect = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_listsForSelect.setLayoutData(g);
-		m_listsForSelect.add("All if they exist");
-		m_listsForSelect.setText("All if they exist");
-		
 		m_listFields = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_listFields.setLayoutData(g);
-		
 		m_selectedLists = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_selectedLists.setLayoutData(g);
-		
 		m_listClearing = new Button (m_baseComposite, SWT.PUSH);
-		g = createGridData (SWT.RIGHT, false, 0);
-		m_listClearing.setLayoutData(g);
-		m_listClearing.setText("Clear list");
-		
-		if (m_listFields != null) 
+		setGroup(groupLabel, "Lists:", m_listsForSelect, m_listFields, m_selectedLists, m_listClearing, new String [] {"Name:", "ID:"});
+	}
+	
+	private void setCombo(Combo a_combo, GridData a_g, String[] a_fieldsForAdding)
+	{
+		a_g = createGridData (SWT.FILL, true, 0);
+		a_combo.setLayoutData(a_g);
+		for (String f : a_fieldsForAdding)
 		{
-			addFieldsAndSetText(m_listFields, new String [] {"Name:", "ID:"}, "Name:");
+			a_combo.add(f);
 		}
+		a_combo.setText(a_fieldsForAdding[0]);
 	}
 	
 	private void createCardParametersGroup(Composite a_control)
@@ -282,47 +246,16 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		dueLabel.setLayoutData(g);
 		
 		m_dueDate = new Combo(dueComposite, SWT.DROP_DOWN);
-		g = createGridData (SWT.FILL, true, 0);
-		m_dueDate.setLayoutData(g);
-		m_dueDate.add("No");
-		m_dueDate.add("All");
-		m_dueDate.add("Select in calendar");
-		m_dueDate.setText("No");
+		setCombo(m_dueDate, g, new String[] {"All", "No", "Select in calendar"});
 		
-		m_nonArchivedCardsButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_nonArchivedCardsButton.setLayoutData(g);
-		m_nonArchivedCardsButton.setText("Only non-archived cards");
-		m_nonArchivedCardsButton.setSelection(true);
+		m_archivedCardSelections = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
+		setCombo(m_archivedCardSelections, g, new String[] {"Only non-archived cards", "Archived and non-archived cards", "Only archived cards"});
 		
-		m_nonCompletedCardsButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_nonCompletedCardsButton.setLayoutData(g);
-		m_nonCompletedCardsButton.setText("Only non-completed cards");
-		
-		m_bothArchivedCardsButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_bothArchivedCardsButton.setLayoutData(g);
-		m_bothArchivedCardsButton.setText("Archived and non-archived cards");
-		
-		m_bothCompletedCardsButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_bothCompletedCardsButton.setLayoutData(g);
-		m_bothCompletedCardsButton.setText("Completed and non-completed cards");
-		m_bothCompletedCardsButton.setSelection(true);
-		
-		m_onlyArchivedCardsButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_onlyArchivedCardsButton.setLayoutData(g);
-		m_onlyArchivedCardsButton.setText("Only archived cards");
-		
-		m_onlyCompletedCardsButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
-		m_onlyCompletedCardsButton.setLayoutData(g);
-		m_onlyCompletedCardsButton.setText("Only completed cards");
+		m_completedCardSelections = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
+		setCombo(m_completedCardSelections, g, new String[] {"Completed and non-completed cards", "Only non-completed cards", "Only completed cards"});
 		
 		m_checkListMovingButton = new Button (m_cardParametersComposite, SWT.CHECK);
-		g = createGridData (SWT.LEFT, false, 0);
+		g = createGridData (SWT.RIGHT, false, 2);
 		m_checkListMovingButton.setLayoutData(g);
 		m_checkListMovingButton.setText("Also move check-lists if they exist");
 		m_checkListMovingButton.setSelection(true);
