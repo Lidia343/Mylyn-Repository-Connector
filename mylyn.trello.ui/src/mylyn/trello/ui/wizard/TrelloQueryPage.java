@@ -1,12 +1,9 @@
 package mylyn.trello.ui.wizard;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.mylyn.commons.workbench.forms.SectionComposite;
-import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
-import org.eclipse.mylyn.tasks.ui.TasksUi;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -15,56 +12,83 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import trello.core.*;
-
 
 public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 {
 	private final static String PAGE_NAME = "TrelloQueryPage";  //Убрать static
-	private final static String PAGE_TITLE = "Enter query parameters";
-	private final static String PAGE_DESCRIPTION = "If_attributes_are_blank_or_stale_press_the_Update_button";
+	private final String pageTitle = "Enter query parameters";
+	private final String pageDescription = "If_attributes_are_blank_or_stale_press_the_Update_button";
 	
-	private final AbstractRepositoryConnector m_connector;
+	private final String m_defaultTrelloObjectSelectionText = "All if they exist";
+	private final String m_fullName = "FullName:";
+	private final String m_username = "Username:";
+	private final String m_email = "Email:";
+	private final String m_name = "Name:";
+	private final String m_url = "URL:";
+	private final String m_id = "ID:";
+	private final String m_all = "All";
+	private final String m_no = "No";
+	private final String m_calendar = "Select in calendar";
+	private final String m_nonArchCards = "Only non-archived cards";
+	private final String m_bothArchCards = "Archived and non-archived cards";
+	private final String m_archCards = "Only archived cards";
+	private final String m_bothCompCards = "Completed and non-completed cards";
+	private final String m_nonCompCards = "Only non-completed cards";
+	private final String m_compCards = "Only completed cards";
+	
+	private final String[] m_memberFiledSelections = {m_fullName, m_username, m_email};
+	private final String[] m_boardFiledSelections = {m_name, m_url, m_id};
+	private final String[] m_listFiledSelections = {m_name, m_id};
+	private final String[] m_dueSelections = {m_all, m_no, m_calendar};
+	private final String[] m_archiveSelections = {m_nonArchCards, m_bothArchCards,  m_archCards};
+	private final String[] m_completingSelections = { m_bothCompCards, m_nonCompCards, m_compCards};
+	
+	private String[] m_suggestedMembers;
+	private String[] m_suggestedBoards;
+	private String[] m_suggestedLists;
+	
+	private String[] m_selectedMembers;
+	private String[] m_selectedBoards;
+	private String[] m_selectedLists;
+	
+	//getQueryTitle()
+	//getConnector()
 	
 	private Composite m_baseComposite;
 	private Composite m_cardParametersComposite;
 	
-	//getQueryTitle()
+	private Combo m_suggestedMembersCombo;
+	private Combo m_suggestedBoardsCombo;
+	private Combo m_suggestedListsCombo;
 	
-	private Combo m_membersForSelect;
-	private Combo m_boardsForSelect;
-	private Combo m_listsForSelect;
+	private Combo m_memberFieldsCombo;
+	private Combo m_boardFieldsCombo;
+	private Combo m_listFieldsCombo;
 	
-	private Combo m_memberFields;
-	private Combo m_boardFields;
-	private Combo m_listFields;
+	private Combo m_selectedMembersCombo;
+	private Combo m_selectedBoardsCombo;
+	private Combo m_selectedListsCombo;
 	
-	private Combo m_selectedMembers;
-	private Combo m_selectedBoards;
-	private Combo m_selectedLists;
+	private Button m_memberClearingButton;
+	private Button m_boardClearingButton;
+	private Button m_listClearingButton;
 	
-	private Button m_memberClearing;
-	private Button m_boardClearing;
-	private Button m_listClearing;
+	private Button m_archivedBoardsButton;
+	private Button m_archivedListsButton;
 	
-	private Button m_closedBoardsButton;
-	private Button m_closedListsButton;
-	
-	private Combo m_archivedCardSelections;
-	private Combo m_completedCardSelections;
+	private Combo m_archivedCardSelectionsCombo;
+	private Combo m_completedCardSelectionsCombo;
 
-	private Combo m_dueDate;
+	private Combo m_dueDateCombo;
 	
 	private Button m_checkListMovingButton;
 	
 	public TrelloQueryPage(TaskRepository a_repository, IRepositoryQuery a_query)
 	{
 		super(PAGE_NAME, a_repository, a_query);
-		setTitle(PAGE_TITLE);
-		setDescription(PAGE_DESCRIPTION);
+		setTitle(pageTitle);
+		setDescription(pageDescription);
 		setNeedsClear(true);
-		m_connector = TasksUi.getRepositoryConnector(getTaskRepository().getConnectorKind());
 	}
 	
 	@Override
@@ -95,9 +119,41 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 
 	private String getQueryUrl(String a_repositoryUrl)
 	{
+		
 		return null;
 	}
 
+	private void clearCombo(Combo a_combo)
+	{
+		a_combo.removeAll();
+		a_combo.setText("");
+	}
+	
+	@Override
+	public void doClearControls()
+	{
+		m_suggestedMembersCombo.setText(m_defaultTrelloObjectSelectionText);
+		m_suggestedBoardsCombo.setText(m_defaultTrelloObjectSelectionText);
+		m_suggestedListsCombo.setText(m_defaultTrelloObjectSelectionText);
+		
+		m_memberFieldsCombo.setText(m_fullName);
+		m_boardFieldsCombo.setText(m_name);
+		m_listFieldsCombo.setText(m_name);
+		
+		clearCombo(m_selectedMembersCombo);
+		clearCombo(m_selectedBoardsCombo);
+		clearCombo(m_selectedListsCombo);
+		
+		if (m_archivedBoardsButton.getSelection()) m_archivedBoardsButton.setSelection(false);
+		if (m_archivedListsButton.getSelection()) m_archivedListsButton.setSelection(false);
+		
+		m_dueDateCombo.setText(m_all);
+		m_archivedCardSelectionsCombo.setText(m_nonArchCards);
+		m_completedCardSelectionsCombo.setText(m_bothCompCards);
+		
+		if (!m_checkListMovingButton.getSelection()) m_checkListMovingButton.setSelection(true);
+	}
+	
 	@Override
 	protected void createPageContent(SectionComposite a_composite)
 	{
@@ -138,15 +194,15 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		createBoardGroup();
 		createListGroup();
 		
-		m_closedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
+		m_archivedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
 		g = createGridData (SWT.RIGHT, false, 5);
-		m_closedBoardsButton.setLayoutData(g);
-		m_closedBoardsButton.setText("See also archived boards");
+		m_archivedBoardsButton.setLayoutData(g);
+		m_archivedBoardsButton.setText("See also archived boards");
 		
-		m_closedListsButton = new Button (m_baseComposite, SWT.CHECK);
+		m_archivedListsButton = new Button (m_baseComposite, SWT.CHECK);
 		g = createGridData (SWT.RIGHT, false, 5);
-		m_closedListsButton.setLayoutData(g);
-		m_closedListsButton.setText("See also archived lists");
+		m_archivedListsButton.setLayoutData(g);
+		m_archivedListsButton.setText("See also archived lists");
 	}
 	
 	private void setGroup(Label a_groupLabel, String a_name, Combo a_linesForSelect, Combo a_fieldLines, Combo a_selectedLines, Button a_cleaning, String[] a_fieldsForAdding)
@@ -157,8 +213,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		
 		g = createGridData (SWT.FILL, true, 0);
 		a_linesForSelect.setLayoutData(g);
-		a_linesForSelect.add("All if they exist");
-		a_linesForSelect.setText("All if they exist");
+		a_linesForSelect.add(m_defaultTrelloObjectSelectionText);
+		a_linesForSelect.setText(m_defaultTrelloObjectSelectionText);
 		
 		g = createGridData (SWT.FILL, true, 0);
 		a_fieldLines.setLayoutData(g);
@@ -185,31 +241,31 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private void createMemberGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		m_membersForSelect = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_memberFields = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_selectedMembers = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_memberClearing = new Button (m_baseComposite, SWT.PUSH);
-		setGroup(groupLabel, "Members:", m_membersForSelect, m_memberFields, m_selectedMembers, m_memberClearing, new String [] {"FullName:", "Username:", "Email:"});
+		m_suggestedMembersCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_memberFieldsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_selectedMembersCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_memberClearingButton = new Button (m_baseComposite, SWT.PUSH);
+		setGroup(groupLabel, "Members:", m_suggestedMembersCombo, m_memberFieldsCombo, m_selectedMembersCombo, m_memberClearingButton, m_memberFiledSelections);
 	}
 	
 	private void createBoardGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		m_boardsForSelect = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_boardFields = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_selectedBoards = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_boardClearing = new Button (m_baseComposite, SWT.PUSH);
-		setGroup(groupLabel, "Boards:", m_boardsForSelect, m_boardFields, m_selectedBoards, m_boardClearing, new String [] {"Name:", "URL:", "ID:"});
+		m_suggestedBoardsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_boardFieldsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_selectedBoardsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_boardClearingButton = new Button (m_baseComposite, SWT.PUSH);
+		setGroup(groupLabel, "Boards:", m_suggestedBoardsCombo, m_boardFieldsCombo, m_selectedBoardsCombo, m_boardClearingButton, m_boardFiledSelections);
 	}
 	
 	private void createListGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		m_listsForSelect = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_listFields = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_selectedLists = new Combo(m_baseComposite, SWT.DROP_DOWN);
-		m_listClearing = new Button (m_baseComposite, SWT.PUSH);
-		setGroup(groupLabel, "Lists:", m_listsForSelect, m_listFields, m_selectedLists, m_listClearing, new String [] {"Name:", "ID:"});
+		m_suggestedListsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_listFieldsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_selectedListsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_listClearingButton = new Button (m_baseComposite, SWT.PUSH);
+		setGroup(groupLabel, "Lists:", m_suggestedListsCombo, m_listFieldsCombo, m_selectedListsCombo, m_listClearingButton, m_listFiledSelections);
 	}
 	
 	private void setCombo(Combo a_combo, GridData a_g, String[] a_fieldsForAdding)
@@ -245,14 +301,14 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		g = createGridData (SWT.RIGHT, false, 0);
 		dueLabel.setLayoutData(g);
 		
-		m_dueDate = new Combo(dueComposite, SWT.DROP_DOWN);
-		setCombo(m_dueDate, g, new String[] {"All", "No", "Select in calendar"});
+		m_dueDateCombo = new Combo(dueComposite, SWT.DROP_DOWN);
+		setCombo(m_dueDateCombo, g, m_dueSelections);
 		
-		m_archivedCardSelections = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
-		setCombo(m_archivedCardSelections, g, new String[] {"Only non-archived cards", "Archived and non-archived cards", "Only archived cards"});
+		m_archivedCardSelectionsCombo = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
+		setCombo(m_archivedCardSelectionsCombo, g, m_archiveSelections);
 		
-		m_completedCardSelections = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
-		setCombo(m_completedCardSelections, g, new String[] {"Completed and non-completed cards", "Only non-completed cards", "Only completed cards"});
+		m_completedCardSelectionsCombo = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
+		setCombo(m_completedCardSelectionsCombo, g, m_completingSelections);
 		
 		m_checkListMovingButton = new Button (m_cardParametersComposite, SWT.CHECK);
 		g = createGridData (SWT.RIGHT, false, 2);
