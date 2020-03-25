@@ -7,11 +7,20 @@ import java.util.List;
  */
 public class CardList
 {
+	private String id;
 	private String name;
 	private List<Card> cards;
 	private String boardId;
 	private String closed;
 
+	/**
+	 * @param a_id - id списка карточек
+	 */
+	public void setId(String a_id)
+	{
+		id = a_id;
+	}
+	
 	/**
 	 * @param a_name - название списка карточек
 	 */
@@ -42,6 +51,14 @@ public class CardList
 	public void setClosed(String a_closed)
 	{
 		closed = a_closed;
+	}
+	
+	/**
+	 * @return id списка карточек
+	 */
+	public String getId()
+	{
+		return id;
 	}
 	
 	/**
