@@ -93,9 +93,17 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private Button m_checkListMovingButton;
 	
-	private List<Board> m_allBoards;
-	private List<User> m_allMembers;
-	private List<CardList> m_allLists;
+	private int m_sugNumber = -1;
+	private int m_selNumber = -1;
+	
+	private List<Board> m_allSugBoards;
+	private List<User> m_allSugMembers;
+	private List<CardList> m_allSugLists;
+	
+	private List<Board> m_allSelBoards = new ArrayList<>();
+	private List<User> m_allSelMembers = new ArrayList<>();
+	private List<CardList> m_allSelLists = new ArrayList<>();
+	private int i;
 	
 	public TrelloQueryPage(TaskRepository a_repository, IRepositoryQuery a_query)
 	{
@@ -109,6 +117,60 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	protected void doRefreshControls()
 	{
 		try
+		{
+			String oldSugBoardId = "";
+			String oldSugBoardName = m_suggestedBoardsCombo.getText();
+			TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+				
+			if (oldSugBoardName.equals(m_defaultTrelloObjectSelectionText))
+			{
+				m_sugNumber = -1;
+				m_selNumber = -1;
+				m_suggestedBoardsCombo.remove(1, m_suggestedBoardsCombo.getItemCount() - 1);
+				m_allSugBoards = client.getBoardList().getBoards();
+				for (Board b : m_allSugBoards)
+				{
+					m_suggestedBoardsCombo.add(b.getName());
+				}
+				m_selectedBoardsCombo.removeAll();
+				m_selectedBoardsCombo.setText("");
+			}
+			else
+			{
+				oldSugBoardId = m_allSugBoards.get(m_suggestedBoardsCombo.getSelectionIndex() - 1).getId();
+				m_suggestedBoardsCombo.remove(1, m_suggestedBoardsCombo.getItemCount() - 1);
+				m_suggestedBoardsCombo.setText(m_defaultTrelloObjectSelectionText);
+				m_allSugBoards = client.getBoardList().getBoards();
+				for (Board b : m_allSugBoards)
+				{
+					if (b.getId().equals(oldSugBoardId))
+						m_suggestedBoardsCombo.setText(oldSugBoardName);
+					m_suggestedBoardsCombo.add(b.getName());
+				}
+				for (Board sel : m_allSelBoards)
+				{
+					if (!m_allSugBoards.contains(sel)) 
+					{
+						m_selectedBoardsCombo.remove(m_allSelBoards.indexOf(sel));
+						m_allSelBoards.remove(sel);
+					}
+				}
+				int selBoardsCount = m_selectedBoardsCombo.getItemCount();
+				int i = -1;
+				for (i = 0; i < selBoardsCount; i++)
+				{
+					if (m_selectedBoardsCombo.getText().equals(m_allSelBoards.get(i).getName()))
+						break;
+				}
+				if (i == selBoardsCount) m_selectedBoardsCombo.setText("");
+			}
+			
+		}
+		catch (IOException e)
+		{
+			setMessage(e.getMessage());
+		}
+		/*try
 		{
 			String oldBoardId = "";
 			String oldBoardName = "";
@@ -187,7 +249,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		catch(IOException e)
 		{
 			setMessage(e.getMessage());
-		}
+		}*/
 	}
 
 	@Override
