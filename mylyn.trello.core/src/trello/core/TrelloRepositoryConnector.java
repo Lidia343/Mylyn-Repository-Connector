@@ -184,11 +184,12 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public IStatus performQuery(@NonNull TaskRepository a_repository, @NonNull IRepositoryQuery a_query, @NonNull TaskDataCollector a_collector, 
 			                    @Nullable ISynchronizationSession a_session, IProgressMonitor a_monitor)
 	{
-		try
+		/*try
 		{
 			//System.out.println(a_query.toString());
 			a_monitor.beginTask("Main task", IProgressMonitor.UNKNOWN);
 			ITrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+			System.out.println(client.doAuth());//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			Map<String, ITask> taskById = new HashMap<String, ITask>();
 			Card temp;
 			for (Card card : client.getAllCards())
@@ -231,7 +232,8 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		finally
 		{
 			a_monitor.done();
-		}
+		}*/
+		return Status.OK_STATUS;
 	}
 	
 	private void showCardInfo(Card temp)
