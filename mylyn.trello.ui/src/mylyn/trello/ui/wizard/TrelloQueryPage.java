@@ -1,8 +1,9 @@
 package mylyn.trello.ui.wizard;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.mylyn.commons.workbench.forms.SectionComposite;
@@ -12,9 +13,6 @@ import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositoryQueryPage2;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -28,7 +26,7 @@ import trello.core.connection.ITrelloConnection;
 import trello.core.connection.TrelloConnection;
 import trello.core.model.Board;
 import trello.core.model.CardList;
-import trello.core.model.User;
+import trello.core.model.Member;
 
 public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 {
@@ -39,8 +37,6 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String m_pageTitle = "Enter query parameters";
 	private final String m_pageDescription = "If_attributes_are_blank_or_stale_press_the_Update_button";
 	
-	private final int m_memberType = 0;
-	private final int m_nonMemberType = 1;
 	private final String m_defaultTrelloObjectSelectionText = "All if they exist";
 	private final String m_fullName = "FullName:";
 	private final String m_username = "Username:";
@@ -65,21 +61,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String[] m_archiveSelections = {m_nonArchCards, m_bothArchCards,  m_archCards};
 	private final String[] m_completingSelections = { m_bothCompCards, m_nonCompCards, m_compCards};
 	
-	private String[] m_suggestedMembers;
-	private String[] m_suggestedBoards;
-	private String[] m_suggestedLists;
-	
-	private String[] m_selectedMembers;
-	private String[] m_selectedBoards;
-	private String[] m_selectedLists;
-	
 	private String m_oldComboText = m_defaultTrelloObjectSelectionText;
 	private String m_oldFieldText = "";
 	
 	private TrelloConnection client;
-
-	//getQueryTitle()
-	//getConnector()
 	
 	private Composite m_baseComposite;
 	private Composite m_cardParametersComposite;
@@ -113,11 +98,12 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private int m_selectedBoardComboTextIndex = -1;
 	
 	private List<Board> m_allSugBoards;
-	private List<User> m_allSugMembers = new ArrayList<>();;
-	private List<CardList> m_allSugLists = new ArrayList<>();;
+	private Map<String, List<Member>> m_allSugMembers = new HashMap<>();
+	private List<Member> m_sugMembers = new ArrayList<>();
+	//private List<CardList> m_allSugLists = new ArrayList<>();
 	
 	private List<Board> m_allSelBoards = new ArrayList<>();
-	private List<User> m_allSelMembers = new ArrayList<>();
+	private List<Member> m_allSelMembers = new ArrayList<>();
 	private List<CardList> m_allSelLists = new ArrayList<>();
 	
 	public TrelloQueryPage(TaskRepository a_repository, IRepositoryQuery a_query)
@@ -136,17 +122,19 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		{
 			refreshCombo(m_suggestedBoardsCombo);
 			refreshCombo(m_suggestedListsCombo);
+			refreshCombo(m_suggestedMembersCombo);
 			
-			clearCombo("", m_suggestedMembersCombo);
 			clearCombo(m_boards, m_selectedBoardsCombo);
 			clearCombo(m_lists, m_selectedListsCombo);
-			clearCombo(m_members, m_selectedMembersCombo);
 			
 			m_allSugBoards = client.getBoardList().getBoards();
+			m_allSugMembers.clear();
 			
 			for (Board b : m_allSugBoards)
 			{
 				m_suggestedBoardsCombo.add(b.getName());
+				String id = b.getId();
+				m_allSugMembers.put(id, client.getMembers(id));
 			}
 		}
 		catch (Exception e)
@@ -204,7 +192,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	@Override
 	public void doClearControls()
 	{
-		m_suggestedMembersCombo.setText("");
+		m_suggestedMembersCombo.setText(m_defaultTrelloObjectSelectionText);
 		m_suggestedBoardsCombo.setText(m_defaultTrelloObjectSelectionText);
 		m_suggestedListsCombo.setText(m_defaultTrelloObjectSelectionText);
 		
@@ -212,7 +200,6 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_boardFieldsCombo.setText(m_name);
 		m_listFieldsCombo.setText(m_name);
 		
-		clearCombo(m_members, m_selectedMembersCombo);
 		clearCombo(m_boards, m_selectedBoardsCombo);
 		clearCombo(m_lists, m_selectedListsCombo);
 		
@@ -262,46 +249,25 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_baseComposite.setLayoutData(g);
 		createGridLayout(m_baseComposite, 5, false);
 		
-		createBoardGroup();
 		createMemberGroup();
+		createBoardGroup();
 		createListGroup();
-		
-		m_archivedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
-		g = createGridData (SWT.RIGHT, false, 5);
-		m_archivedBoardsButton.setLayoutData(g);
-		m_archivedBoardsButton.setText("See also archived boards");
-		
-		m_archivedListsButton = new Button (m_baseComposite, SWT.CHECK);
-		g = createGridData (SWT.RIGHT, false, 5);
-		m_archivedListsButton.setLayoutData(g);
-		m_archivedListsButton.setText("See also archived lists");
+		createArchivedGroup();
 	}
 	
-	private void setGroup(int a_groupType, Label a_groupLabel, String a_name, Combo a_linesForSelect, Combo a_fieldLines, Combo a_selectedLines, Button a_cleaning, String[] a_fieldsForAdding, SelectionListener listener)
+	private void setGroup(Label a_groupLabel, String a_name, Combo a_linesForSelect, Combo a_fieldLines, Combo a_selectedLines, Button a_cleaning, String[] a_fieldsForAdding, SelectionListener listener)
 	{
 		a_groupLabel.setText(a_name);
 		GridData g = createGridData (SWT.RIGHT, false, 0);
 		a_groupLabel.setLayoutData(g);
 		
-		if (a_groupType != m_memberType)
-		{
-			g = createGridData (SWT.FILL, true, 0);
-			a_linesForSelect.setLayoutData(g);
-			a_linesForSelect.add(m_defaultTrelloObjectSelectionText);
-			a_linesForSelect.setText(m_defaultTrelloObjectSelectionText);
-		}
+		g = createGridData (SWT.FILL, true, 0);
+		a_linesForSelect.setLayoutData(g);
+		a_linesForSelect.add(m_defaultTrelloObjectSelectionText);
+		a_linesForSelect.setText(m_defaultTrelloObjectSelectionText);
 		
 		g = createGridData (SWT.FILL, true, 0);
 		a_fieldLines.setLayoutData(g);
-		
-		if (a_groupType == m_memberType)
-		{
-			g = createGridData (SWT.FILL, true, 3);
-			a_linesForSelect.setLayoutData(g);
-			a_linesForSelect.add(m_defaultTrelloObjectSelectionText);
-			addFieldsAndSetText(a_fieldLines, a_fieldsForAdding, a_fieldsForAdding[0]);
-			return;
-		}
 		
 		g = createGridData (SWT.FILL, true, 0);
 		a_selectedLines.setLayoutData(g);
@@ -455,17 +421,19 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 					
 					if (memberFieldText.equals(m_oldFieldText)) return;
 					
-					for (int i = 0; i < m_allSelMembers.size(); i++)
+					
+					for (int i = 0; i < m_sugMembers.size(); i++)
 					{
-						User member = m_allSelMembers.get(i);
+						Member member = m_sugMembers.get(i);
+						//System.out.println("" + i + " " + member.toString());
 						if (memberFieldText.equals(m_fullName))
-							m_selectedMembersCombo.setItem(i, member.getFullName());
+							m_suggestedMembersCombo.setItem(i, member.getFullName());
 						
 						if (memberFieldText.equals(m_username))
-							m_selectedMembersCombo.setItem(i, member.getUsername());
+							m_suggestedMembersCombo.setItem(i, member.getUsername());
 							
 						if (memberFieldText.equals(m_email))
-							m_selectedMembersCombo.setItem(i, member.getEmail());
+							m_suggestedMembersCombo.setItem(i, member.getEmail());
 					}
 				}
 				
@@ -497,10 +465,13 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private void createMemberGroup()
 	{
 		Label groupLabel = new Label (m_baseComposite, SWT.NONE);
-		m_memberFieldsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
 		m_suggestedMembersCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_memberFieldsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_selectedMembersCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
+		m_memberClearingButton = new Button (m_baseComposite, SWT.PUSH);
 		SelectionListener listener = getClearListener (m_members, m_selectedMembersCombo);
-		setGroup(m_memberType, groupLabel, "Members.", m_suggestedMembersCombo, m_memberFieldsCombo, m_selectedMembersCombo, m_memberClearingButton, m_memberFiledSelections, listener);
+		
+		setGroup(groupLabel, "Members:", m_suggestedMembersCombo, m_memberFieldsCombo, m_selectedMembersCombo, m_memberClearingButton, m_memberFiledSelections, listener);
 		
 		addFocusAndSelectionFieldsComboLisener(m_members, m_memberFieldsCombo);
 		
@@ -531,7 +502,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_selectedBoardsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
 		m_boardClearingButton = new Button (m_baseComposite, SWT.PUSH);
 		SelectionListener listener = getClearListener (m_boards, m_selectedBoardsCombo);
-		setGroup(m_nonMemberType, groupLabel, "Boards:", m_suggestedBoardsCombo, m_boardFieldsCombo, m_selectedBoardsCombo, m_boardClearingButton, m_boardFiledSelections, listener);
+		setGroup(groupLabel, "Boards:", m_suggestedBoardsCombo, m_boardFieldsCombo, m_selectedBoardsCombo, m_boardClearingButton, m_boardFiledSelections, listener);
 		
 		m_selectedBoardsCombo.addSelectionListener(new SelectionListener ()
 		{
@@ -539,6 +510,41 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex();
+				
+				m_sugMembers.clear();
+				m_suggestedMembersCombo.removeAll();
+				List<Member> members = m_allSugMembers.get(m_allSelBoards.get(m_selectedBoardsCombo.getSelectionIndex()).getId());
+				
+				
+				for (Member m : members)
+				{
+					for (Member u : m_sugMembers)
+					{
+						if (m.getId().equals(u.getId())) return;
+					}
+					
+					m_sugMembers.add(m);
+					
+					String memberFieldText = m_memberFieldsCombo.getText();
+					
+					if (memberFieldText.equals(m_fullName))
+					{
+						m_suggestedMembersCombo.add(m.getFullName());
+						m_suggestedMembersCombo.setText(m.getFullName());
+					}
+					
+					if (memberFieldText.equals(m_username))
+					{
+						m_suggestedMembersCombo.add(m.getUsername());
+						m_suggestedMembersCombo.setText(m.getUsername());
+					}
+						
+					if (memberFieldText.equals(m_email))
+					{
+						m_suggestedMembersCombo.add(m.getEmail());
+						m_suggestedMembersCombo.setText(m.getEmail());
+					}
+				}
 			}
 
 			@Override
@@ -610,7 +616,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_selectedListsCombo = new Combo(m_baseComposite, SWT.DROP_DOWN);
 		m_listClearingButton = new Button (m_baseComposite, SWT.PUSH);
 		SelectionListener listener = getClearListener (m_lists, m_selectedListsCombo);
-		setGroup(m_nonMemberType, groupLabel, "Lists:", m_suggestedListsCombo, m_listFieldsCombo, m_selectedListsCombo, m_listClearingButton, m_listFiledSelections, listener);
+		setGroup(groupLabel, "Lists:", m_suggestedListsCombo, m_listFieldsCombo, m_selectedListsCombo, m_listClearingButton, m_listFiledSelections, listener);
 		
 		addFocusAndSelectionFieldsComboLisener(m_lists, m_listFieldsCombo);
 		
@@ -629,6 +635,19 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			}
 		});
 		addFocusComboListener (m_suggestedListsCombo);
+	}
+	
+	private void createArchivedGroup ()
+	{
+		m_archivedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
+		GridData g = createGridData (SWT.RIGHT, false, 5);
+		m_archivedBoardsButton.setLayoutData(g);
+		m_archivedBoardsButton.setText("See also archived boards");
+		
+		m_archivedListsButton = new Button (m_baseComposite, SWT.CHECK);
+		g = createGridData (SWT.RIGHT, false, 5);
+		m_archivedListsButton.setLayoutData(g);
+		m_archivedListsButton.setText("See also archived lists");
 	}
 	
 	private void setCombo(Combo a_combo, GridData a_g, String[] a_fieldsForAdding)
