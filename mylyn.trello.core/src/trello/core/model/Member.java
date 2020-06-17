@@ -3,12 +3,21 @@ package trello.core.model;
 /**
  * Класс необходим для хранения информации о пользователе.
  */
-public class User
+public class Member
 {
+	private String id;
 	private String fullName;
 	private String username;
 	private String email;
 
+	/**
+	 * @param a_id - id пользователя
+	 */
+	public void setId(String a_id)
+	{
+		id = a_id;
+	}
+	
 	/**
 	 * @param a_fullName - полное имя пользователя
 	 */
@@ -32,7 +41,15 @@ public class User
 	{
 		email = a_email;
 	}
-
+	
+	/**
+	 * @return id пользователя
+	 */
+	public String getId()
+	{
+		return id;
+	}
+	
 	/**
 	 * @return полное имя пользователя
 	 */

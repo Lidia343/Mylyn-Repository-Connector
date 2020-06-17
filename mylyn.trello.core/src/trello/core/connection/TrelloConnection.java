@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,13 +22,14 @@ import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
-import trello.core.model.User;
+import trello.core.model.Member;
 
 /**
  * Класс предназначен для установки соединения с сайтом trello.com и получения
  * от него пользовательских данных (информации о пользователе, его досках,
  * списках и карточках).
  */
+@SuppressWarnings("restriction")
 public class TrelloConnection implements ITrelloConnection
 {
 	private String m_key;
@@ -43,12 +45,12 @@ public class TrelloConnection implements ITrelloConnection
 	}
 	
 	@Override
-	public User getUserData() throws IOException
+	public Member getMemberData() throws IOException
 	{
 		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=fullName,username,email&key=" + m_key + "&token=" + m_token);
-		User user = null;
+		Member user = null;
 		if(line != null)
-			user = m_gson.fromJson(line, User.class);
+			user = m_gson.fromJson(line, Member.class);
 		return user;
 	}
 
@@ -82,8 +84,8 @@ public class TrelloConnection implements ITrelloConnection
 	 */
 	private String connectByUrlAndGetResponse(String a_requestMethod, String a_url) throws IOException
 	{
-		URL userDataURL = new URL(a_url);
-		HttpURLConnection connection = (HttpURLConnection) userDataURL.openConnection();
+		URL url = new URL(a_url);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setRequestMethod(a_requestMethod);
 		connection.connect();
 		int responseCode = connection.getResponseCode();
@@ -186,5 +188,57 @@ public class TrelloConnection implements ITrelloConnection
 			}
 		}
 		return cards;
+	}
+
+	@Override
+	public String doAuth() 
+	{
+		String res = "Error";
+		try
+		{
+			URL userDataURL = new URL("https://trello.com/login");
+			HttpURLConnection connection = (HttpURLConnection) userDataURL.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setDoOutput(true);
+			String par = Base64.getEncoder().encodeToString(("Lidia343" + ":" + "Era3vnomnagna0H").getBytes());
+			connection.setRequestProperty("Authorization", "Basic " + par);
+			connection.connect();
+			int responseCode = connection.getResponseCode();
+			if(responseCode >= 400 && responseCode < 500)
+			{
+				throw new IOException("Ошибка клиента");
+			}
+			if(responseCode >= 500)
+			{
+				throw new IOException("Ошибка сервера");
+			}
+			
+			try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream())))
+			{
+				StringBuilder builder = new StringBuilder();
+				String line;
+				while((line = bufferedReader.readLine()) != null)
+				{
+					builder.append(line + "\n");
+				}
+				connection.disconnect();
+				return builder.toString();
+			}
+		}
+		catch(Exception e)
+		{
+			
+		}
+		return res;
+	}
+
+	@Override
+	public List<Member> getMembers(String a_boardId) throws IOException
+	{
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/members?key=" + m_key + "&token=" + m_token);
+		List<Member> members = null;
+		if(line != null)
+			members = m_gson.fromJson(line, new TypeToken<List<Member>>(){}.getType());
+		return members;
 	}
 }
