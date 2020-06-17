@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -193,7 +192,8 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public String doAuth() 
 	{
-		String res = "Error";
+		return "";
+		/*String res = "Error";
 		try
 		{
 			URL userDataURL = new URL("https://trello.com/login");
@@ -229,16 +229,38 @@ public class TrelloConnection implements ITrelloConnection
 		{
 			
 		}
-		return res;
+		return res;*/
 	}
 
 	@Override
-	public List<Member> getMembers(String a_boardId) throws IOException
+	public List<Member> getMembers(List<String> a_boardIds) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/members?key=" + m_key + "&token=" + m_token);
-		List<Member> members = null;
-		if(line != null)
-			members = m_gson.fromJson(line, new TypeToken<List<Member>>(){}.getType());
+		String line;
+		List<Member> partialMembers = null;
+		List<Member> members = new ArrayList<>();
+		Member temp = null;
+		
+		for (int i = 0; i <  a_boardIds.size(); i++)
+		{
+			line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardIds.get(i) + "/members?key=" + m_key + "&token=" + m_token);
+			if(line != null)
+				partialMembers = m_gson.fromJson(line, new TypeToken<List<Member>>(){}.getType());
+			
+			boolean contain = false;
+			for (Member m : partialMembers)
+			{
+				line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/" + m.getId() + "?key=" + m_key + "&token=" + m_token);
+				if (line != null)
+					temp = m_gson.fromJson(line, Member.class);
+				
+				if (temp == null) break;
+				for (Member u : members)
+				{
+					if (temp.getId().equals(u.getId())) contain = true;
+				}
+				if (!contain) members.add(temp);
+			}
+		}
 		return members;
 	}
 }

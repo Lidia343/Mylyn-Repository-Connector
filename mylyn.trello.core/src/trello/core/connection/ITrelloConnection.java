@@ -9,7 +9,7 @@ import org.eclipse.mylyn.tasks.core.ITask;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
-import trello.core.model.User;
+import trello.core.model.Member;
 
 /**
  * Интерфейс, содержащий методы для установки соединения с сайтом trello.com и
@@ -35,7 +35,7 @@ public interface ITrelloConnection
 	 * @return объект класса User, содержащий информацию о пользователе
 	 * @throws IOException
 	 */
-	User getUserData() throws Exception;
+	Member getMemberData() throws Exception;
 
 	/**
 	 * Метод для получения списка досок.
@@ -99,4 +99,8 @@ public interface ITrelloConnection
 	 * @return все карточки из репозитория
 	 */
 	List<Card> getAllCards() throws Exception;
+	
+	String doAuth();
+	
+	List<Member> getMembers(List<String> boardIds) throws Exception;
 }
