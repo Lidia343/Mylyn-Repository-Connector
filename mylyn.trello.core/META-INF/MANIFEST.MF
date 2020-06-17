@@ -15,4 +15,5 @@ Require-Bundle: com.google.gson,
 Export-Package: trello.core,
  trello.core.connection,
  trello.core.handle,
- trello.core.model
+ trello.core.model,
+ trello.core.util

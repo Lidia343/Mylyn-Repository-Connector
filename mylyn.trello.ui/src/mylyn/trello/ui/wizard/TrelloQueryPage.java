@@ -1,9 +1,7 @@
 package mylyn.trello.ui.wizard;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.mylyn.commons.workbench.forms.SectionComposite;
@@ -21,7 +19,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 
+import mylyn.trello.ui.calendar.CalendarDialog;
+import mylyn.trello.ui.handle.FinishHandler;
 import trello.core.connection.ITrelloConnection;
 import trello.core.connection.TrelloConnection;
 import trello.core.model.Board;
@@ -95,16 +96,22 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private Button m_checkListMovingButton;
 	
+	private int m_selectedMemberComboTextIndex = -1;
 	private int m_selectedBoardComboTextIndex = -1;
+	private int m_selectedListComboTextIndex = -1;
 	
 	private List<Board> m_allSugBoards;
-	private Map<String, List<Member>> m_allSugMembers = new HashMap<>();
-	private List<Member> m_sugMembers = new ArrayList<>();
+	private List<Member> m_allSugMembers = new ArrayList<>();
+	//private List<Member> m_sugMembers = new ArrayList<>();
 	//private List<CardList> m_allSugLists = new ArrayList<>();
 	
 	private List<Board> m_allSelBoards = new ArrayList<>();
 	private List<Member> m_allSelMembers = new ArrayList<>();
 	private List<CardList> m_allSelLists = new ArrayList<>();
+	
+	private Shell m_parent;
+	private CalendarDialog m_calendarDialog;
+	private String m_dateAndTime = "";
 	
 	public TrelloQueryPage(TaskRepository a_repository, IRepositoryQuery a_query)
 	{
@@ -120,21 +127,26 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	{
 		try
 		{
-			refreshCombo(m_suggestedBoardsCombo);
-			refreshCombo(m_suggestedListsCombo);
-			refreshCombo(m_suggestedMembersCombo);
+			clearCombo(m_suggestedBoardsCombo);
+			clearCombo(m_suggestedListsCombo);
+			clearCombo(m_suggestedMembersCombo);
+			m_suggestedMembersCombo.add(m_defaultTrelloObjectSelectionText);
 			
+			clearCombo(m_members, m_selectedMembersCombo);
 			clearCombo(m_boards, m_selectedBoardsCombo);
 			clearCombo(m_lists, m_selectedListsCombo);
 			
 			m_allSugBoards = client.getBoardList().getBoards();
-			m_allSugMembers.clear();
+			List<String> boardIds = new ArrayList<>();
 			
 			for (Board b : m_allSugBoards)
 			{
-				m_suggestedBoardsCombo.add(b.getName());
-				String id = b.getId();
-				m_allSugMembers.put(id, client.getMembers(id));
+				boardIds.add(b.getId());
+			}
+			m_allSugMembers = client.getMembers(boardIds);
+			for (Member m : m_allSugMembers)
+			{
+				m_suggestedMembersCombo.add(m.getFullName());
 			}
 		}
 		catch (Exception e)
@@ -171,7 +183,6 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private void clearCombo(String a_comboName, Combo a_combo)
 	{
 		a_combo.removeAll();
-		a_combo.setText("");
 		
 		if (a_comboName.equals(m_boards))
 			m_allSelBoards.clear();
@@ -183,23 +194,19 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			m_allSelLists.clear();
 	}
 	
-	private void refreshCombo(Combo a_combo)
+	private void clearCombo(Combo a_combo)
 	{
-		a_combo.remove(1, a_combo.getItemCount() - 1);
-		a_combo.setText(m_defaultTrelloObjectSelectionText);
+		a_combo.removeAll();
 	}
 	
 	@Override
 	public void doClearControls()
 	{
-		m_suggestedMembersCombo.setText(m_defaultTrelloObjectSelectionText);
-		m_suggestedBoardsCombo.setText(m_defaultTrelloObjectSelectionText);
-		m_suggestedListsCombo.setText(m_defaultTrelloObjectSelectionText);
-		
 		m_memberFieldsCombo.setText(m_fullName);
 		m_boardFieldsCombo.setText(m_name);
 		m_listFieldsCombo.setText(m_name);
 		
+		clearCombo(m_boards, m_selectedMembersCombo);
 		clearCombo(m_boards, m_selectedBoardsCombo);
 		clearCombo(m_lists, m_selectedListsCombo);
 		
@@ -216,6 +223,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	@Override
 	protected void createPageContent(SectionComposite a_composite)
 	{
+		m_parent = a_composite.getShell();
 		Composite control = a_composite.getContent();
 
 		GridLayout layout = new GridLayout(1, false);
@@ -263,8 +271,6 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		
 		g = createGridData (SWT.FILL, true, 0);
 		a_linesForSelect.setLayoutData(g);
-		a_linesForSelect.add(m_defaultTrelloObjectSelectionText);
-		a_linesForSelect.setText(m_defaultTrelloObjectSelectionText);
 		
 		g = createGridData (SWT.FILL, true, 0);
 		a_fieldLines.setLayoutData(g);
@@ -392,26 +398,17 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 					for (int i = 0; i < m_allSelBoards.size(); i++)
 					{
 						Board board = m_allSelBoards.get(i);
+						
+						if (m_selectedBoardsCombo.getText().equals("")) m_selectedBoardComboTextIndex = -1;
+						
 						if (boardFieldText.equals(m_id))
-						{
-							m_selectedBoardsCombo.setItem(i, board.getId());
-							if (i == m_selectedBoardComboTextIndex)
-								m_selectedBoardsCombo.setText(board.getId());
-						}
+							setItemAndText(m_selectedBoardsCombo, board.getId(), i, m_selectedBoardComboTextIndex);
 						
 						if (boardFieldText.equals(m_name))
-						{
-							m_selectedBoardsCombo.setItem(i, board.getName());
-							if (i == m_selectedBoardComboTextIndex)
-								m_selectedBoardsCombo.setText(board.getName());
-						}
+							setItemAndText(m_selectedBoardsCombo, board.getName(), i, m_selectedBoardComboTextIndex);
 							
 						if (boardFieldText.equals(m_url))
-						{
-							m_selectedBoardsCombo.setItem(i, board.getUrl());
-							if (i == m_selectedBoardComboTextIndex)
-								m_selectedBoardsCombo.setText(board.getUrl());
-						}
+							setItemAndText(m_selectedBoardsCombo, board.getUrl(), i, m_selectedBoardComboTextIndex);
 					}
 				}
 				
@@ -421,19 +418,21 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 					
 					if (memberFieldText.equals(m_oldFieldText)) return;
 					
-					
-					for (int i = 0; i < m_sugMembers.size(); i++)
+					for (int i = 0; i < m_allSelMembers.size(); i++)
 					{
-						Member member = m_sugMembers.get(i);
-						//System.out.println("" + i + " " + member.toString());
+						Member member = m_allSelMembers.get(i);
+						
+						if (m_selectedMembersCombo.getText().equals("")) m_selectedMemberComboTextIndex = -1;
+						
 						if (memberFieldText.equals(m_fullName))
-							m_suggestedMembersCombo.setItem(i, member.getFullName());
+							setItemAndText(m_selectedMembersCombo, member.getFullName(), i, m_selectedMemberComboTextIndex);
 						
 						if (memberFieldText.equals(m_username))
-							m_suggestedMembersCombo.setItem(i, member.getUsername());
+							setItemAndText(m_selectedMembersCombo, member.getUsername(), i, m_selectedMemberComboTextIndex);
 							
 						if (memberFieldText.equals(m_email))
-							m_suggestedMembersCombo.setItem(i, member.getEmail());
+							setItemAndText(m_selectedMembersCombo, member.getEmail(), i, m_selectedMemberComboTextIndex);
+						
 					}
 				}
 				
@@ -446,11 +445,14 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 					for (int i = 0; i < m_allSelLists.size(); i++)
 					{
 						CardList list = m_allSelLists.get(i);
+						
+						if (m_selectedListsCombo.getText().equals("")) m_selectedListComboTextIndex = -1;
+						
 						if (listFieldText.equals(m_id))
-							m_selectedListsCombo.setItem(i, list.getId());
+							setItemAndText(m_selectedListsCombo, list.getId(), i, m_selectedListComboTextIndex);
 						
 						if (listFieldText.equals(m_name))
-							m_selectedListsCombo.setItem(i, list.getName());
+							setItemAndText(m_selectedListsCombo, list.getName(), i, m_selectedListComboTextIndex);
 					}
 				}
 			}
@@ -460,6 +462,13 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			{
 			}
 		});
+	}
+	
+	private void setItemAndText (Combo a_combo, String a_item, int a_id, int a_index)
+	{
+		a_combo.setItem(a_id, a_item);
+		if (a_id == a_index)
+			a_combo.setText(a_item);
 	}
 	
 	private void createMemberGroup()
@@ -477,12 +486,64 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		
 		m_suggestedMembersCombo.addSelectionListener(new SelectionListener() 
 		{
-
 			@Override
 			public void widgetSelected(SelectionEvent a_e)
 			{
-				m_oldComboText = m_suggestedMembersCombo.getText();
+				//m_oldComboText = m_suggestedMembersCombo.getText();
 				
+				if (m_suggestedMembersCombo.getText().equals(m_defaultTrelloObjectSelectionText))
+				for (Member m : m_allSugMembers)
+				{
+					m_allSelMembers.clear();
+					m_selectedMembersCombo.removeAll();
+					m_selectedMembersCombo.add(m_defaultTrelloObjectSelectionText); ////////////////////////Обновить другие места!!!!!!!!!!!!!!!!!!!!!!!!!
+					m_allSelMembers.add(m);
+					
+					String memberFieldText = m_memberFieldsCombo.getText();
+					
+					if (memberFieldText.equals(m_fullName))
+					{
+						m_selectedMembersCombo.add(m.getFullName());
+					}
+					
+					if (memberFieldText.equals(m_username))
+					{
+						m_selectedMembersCombo.add(m.getUsername());
+					}
+						
+					if (memberFieldText.equals(m_email))
+					{
+						m_selectedMembersCombo.add(m.getEmail());
+					}
+				}
+				else
+				{
+					if (m_selectedMembersCombo.getItemCount() == 0)
+						m_selectedMembersCombo.add(m_defaultTrelloObjectSelectionText);  ////////////////////////Обновить другие места!!!!!!!!!!!!!!!!!!!!!!!!!
+					
+					Member m = m_allSugMembers.get(m_suggestedMembersCombo.getSelectionIndex() - 1);
+					if (!m_allSelMembers.contains(m))
+					{
+						m_allSelMembers.add(m);
+						
+						String memberFieldText = m_memberFieldsCombo.getText();////Добавить методы
+						
+						if (memberFieldText.equals(m_fullName))
+						{
+							m_selectedMembersCombo.add(m.getFullName());
+						}
+						
+						if (memberFieldText.equals(m_username))
+						{
+							m_selectedMembersCombo.add(m.getUsername());
+						}
+							
+						if (memberFieldText.equals(m_email))
+						{
+							m_selectedMembersCombo.add(m.getEmail());
+						}
+					}
+				}
 			}
 
 			@Override
@@ -509,12 +570,12 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			@Override
 			public void widgetSelected(SelectionEvent a_e)
 			{
-				m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex();
+				/*m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex();
 				
 				m_sugMembers.clear();
 				m_suggestedMembersCombo.removeAll();
-				List<Member> members = m_allSugMembers.get(m_allSelBoards.get(m_selectedBoardsCombo.getSelectionIndex()).getId());
-				
+				//List<Member> members = m_allSugMembers.get(m_allSelBoards.get(m_selectedBoardsCombo.getSelectionIndex()).getId());
+				List<Member> members = new ArrayList<>();
 				
 				for (Member m : members)
 				{
@@ -544,7 +605,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 						m_suggestedMembersCombo.add(m.getEmail());
 						m_suggestedMembersCombo.setText(m.getEmail());
 					}
-				}
+				}*/
 			}
 
 			@Override
@@ -559,11 +620,11 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			@Override
 			public void widgetSelected(SelectionEvent a_e)
 			{
-				m_oldComboText =  m_suggestedBoardsCombo.getText();
+				/*m_oldComboText =  m_suggestedBoardsCombo.getText();
 				int selIndex = m_suggestedBoardsCombo.getSelectionIndex();
 				
 				clearCombo("", m_suggestedMembersCombo);
-				refreshCombo(m_suggestedListsCombo);
+				clearCombo(m_suggestedListsCombo);
 				
 				if (selIndex != 0)
 				{
@@ -597,7 +658,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 							m_selectedBoardsCombo.add(boardUrl);
 						}
 					}
-				}
+				}*/
 			}
 
 			@Override
@@ -697,5 +758,33 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_checkListMovingButton.setLayoutData(g);
 		m_checkListMovingButton.setText("Also move check-lists if they exist");
 		m_checkListMovingButton.setSelection(true);
+		
+		FinishHandler m_handler = new FinishHandler () 
+		{
+			@Override
+			public void finish(String a_result)
+			{
+				m_dateAndTime = a_result;
+				System.out.println(m_dateAndTime);
+			}
+		};
+		
+		m_dueDateCombo.addSelectionListener(new SelectionListener() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent a_e)
+			{
+				if (m_dueDateCombo.getText().equals(m_calendar) && (m_calendarDialog == null || m_calendarDialog.isDisposed()))
+				{
+					m_calendarDialog = new CalendarDialog (m_parent, m_handler);
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent a_e)
+			{
+				
+			}
+		});
 	}
 }
