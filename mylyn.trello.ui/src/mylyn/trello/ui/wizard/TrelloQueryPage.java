@@ -621,44 +621,21 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_oldValueComboText =  m_suggestedBoardsCombo.getText();
-				/*int selIndex = m_suggestedBoardsCombo.getSelectionIndex();
 				
-				clearCombo("", m_suggestedMembersCombo);
-				clearCombo(m_suggestedListsCombo);
+				addDefaultItemIfComboIsEmpty (m_selectedBoardsCombo);
 				
-				if (selIndex != 0)
+				if (m_suggestedBoardsCombo.getText().equals(m_defaultTrelloObjectSelectionText))
 				{
-					Board board = m_allSugBoards.get(selIndex - 1);
-					String boardName = board.getName();
-					String boardId = board.getId();
-					String boardUrl = board.getUrl();
-					
-					if (!m_allSelBoards.contains(board))
+					for (Board b : m_allSugBoards)
 					{
-						m_allSelBoards.add(board);
-						String boardFieldText = m_boardFieldsCombo.getText();
-						
-						m_selectedBoardComboTextIndex = m_allSelBoards.indexOf(board); //////////////////////////////////////////
-						
-						if (boardFieldText.equals(m_id))
-						{
-							m_selectedBoardsCombo.setText(boardId);
-							m_selectedBoardsCombo.add(boardId);
-						}
-						
-						if (boardFieldText.equals(m_name))
-						{
-							m_selectedBoardsCombo.setText(boardName);
-							m_selectedBoardsCombo.add(boardName);
-						}
-							
-						if (boardFieldText.equals(m_url))
-						{
-							m_selectedBoardsCombo.setText(boardUrl);
-							m_selectedBoardsCombo.add(boardUrl);
-						}
+						addUniqueBoardToSelectedCombo(b);
 					}
-				}*/
+				}
+				else
+				{
+					Board b = m_allSugBoards.get(m_suggestedBoardsCombo.getSelectionIndex() - 1);
+					addUniqueBoardToSelectedCombo(b);
+				}
 			}
 
 			@Override
@@ -721,6 +698,19 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		addFocusComboListener(m_suggestedBoardsCombo);
 		addFocusComboListener(m_selectedBoardsCombo);
 		addFocusAndSelectionFieldsComboLisener(m_boards, m_boardFieldsCombo);
+	}
+	
+	private void addUniqueBoardToSelectedCombo (Board a_b)
+	{
+		if (!m_allSelBoards.contains(a_b))
+		{
+			m_allSelBoards.add(a_b);
+			
+			String boardFieldText = m_boardFieldsCombo.getText();
+			if (boardFieldText.equals(m_id)) m_selectedBoardsCombo.add(a_b.getId());
+			if (boardFieldText.equals(m_name)) m_selectedBoardsCombo.add(a_b.getName());
+			if (boardFieldText.equals(m_url))  m_selectedBoardsCombo.add(a_b.getUrl());
+		}
 	}
 	
 	private void createListGroup()
