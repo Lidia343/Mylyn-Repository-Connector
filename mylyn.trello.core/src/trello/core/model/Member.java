@@ -62,7 +62,7 @@ public class Member
 	 * @return логин пользователя
 	 */
 	public String getUsername()
-	{
+	{ 
 		return username;
 	}
 
@@ -71,6 +71,7 @@ public class Member
 	 */
 	public String getEmail()
 	{
+		if (email == null) email = "";
 		return email;
 	}
 }
