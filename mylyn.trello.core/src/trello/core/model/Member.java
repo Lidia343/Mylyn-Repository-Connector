@@ -1,7 +1,7 @@
 package trello.core.model;
 
 /**
- * Класс необходим для хранения информации о пользователе.
+ * Класс необходим для хранения информации о участнике.
  */
 public class Member
 {
@@ -9,9 +9,10 @@ public class Member
 	private String fullName;
 	private String username;
 	private String email;
+	private String[] idBoards;
 
 	/**
-	 * @param a_id - id пользователя
+	 * @param a_id - id участника
 	 */
 	public void setId(String a_id)
 	{
@@ -19,7 +20,7 @@ public class Member
 	}
 	
 	/**
-	 * @param a_fullName - полное имя пользователя
+	 * @param a_fullName - полное имя участника
 	 */
 	public void setFullName(String a_fullName)
 	{
@@ -27,7 +28,7 @@ public class Member
 	}
 
 	/**
-	 * @param a_username - логин пользователя
+	 * @param a_username - логин участника
 	 */
 	public void setUserName(String a_username)
 	{
@@ -35,7 +36,15 @@ public class Member
 	}
 
 	/**
-	 * @param email- email-адрес пользователя
+	 * @param a_idBoards - список id досок участника
+	 */
+	public void setIdBoards (String[] a_idBoards)
+	{
+		idBoards = a_idBoards;
+	}
+	
+	/**
+	 * @param email- email-адрес участника
 	 */
 	public void setEmail(String a_email)
 	{
@@ -43,7 +52,7 @@ public class Member
 	}
 	
 	/**
-	 * @return id пользователя
+	 * @return id участника
 	 */
 	public String getId()
 	{
@@ -51,7 +60,7 @@ public class Member
 	}
 	
 	/**
-	 * @return полное имя пользователя
+	 * @return полное имя участника
 	 */
 	public String getFullName()
 	{
@@ -59,7 +68,7 @@ public class Member
 	}
 
 	/**
-	 * @return логин пользователя
+	 * @return логин участника
 	 */
 	public String getUsername()
 	{ 
@@ -67,11 +76,19 @@ public class Member
 	}
 
 	/**
-	 * @return адрес электронной почты пользователя
+	 * @return адрес электронной почты участника
 	 */
 	public String getEmail()
 	{
 		if (email == null) email = "";
 		return email;
+	}
+	
+	/**
+	 * @return список id досок участника
+	 */
+	public String[] getaIdBoards()
+	{ 
+		return idBoards;
 	}
 }

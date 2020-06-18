@@ -502,13 +502,13 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				{
 					for (Member m : m_allSugMembers)
 					{
-						addUniqueMemberToSelectedMembersCombo(m);
+						addUniqueMemberToSelectedCombo(m);
 					}
 				}
 				else
 				{
 					Member m = m_allSugMembers.get(m_suggestedMembersCombo.getSelectionIndex() - 1);
-					addUniqueMemberToSelectedMembersCombo(m);
+					addUniqueMemberToSelectedCombo(m);
 				}
 			}
 
@@ -523,8 +523,45 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			@Override
 			public void widgetSelected(SelectionEvent a_e)
 			{
-				m_selectedMemberComboTextIndex = m_selectedMembersCombo.getSelectionIndex() - 1;
-				m_oldValueComboText = m_selectedMembersCombo.getText();//////////////////////////////////////////////////////////////////////////
+				int selectionIndex = m_selectedMembersCombo.getSelectionIndex() - 1;
+				if (selectionIndex == m_selectedMemberComboTextIndex) return;
+				
+				m_selectedMemberComboTextIndex = selectionIndex;
+				m_oldValueComboText = m_selectedMembersCombo.getText();
+				
+				m_allSugBoards.clear();
+				m_suggestedBoardsCombo.removeAll();
+				m_suggestedBoardsCombo.add(m_defaultTrelloObjectSelectionText);
+
+				String[] idBoards;
+				if (m_selectedMembersCombo.getText().equals(m_defaultTrelloObjectSelectionText))
+				{
+					boolean contain;
+					for (Member m : m_allSelMembers)
+					{
+						idBoards = m.getaIdBoards();
+						
+						for (int i = 0; i < idBoards.length; i++)
+						{
+							contain = false;
+							for (Board b : m_allSugBoards)
+							{
+								if (idBoards[i].equals(b.getId())) contain = true;
+							}
+							
+							if (!contain) addBoardToSuggestedCombo(idBoards[i]);
+						}
+					}
+				}
+				else
+				{
+					Member m = m_allSelMembers.get(m_selectedMemberComboTextIndex);
+					idBoards = m.getaIdBoards();
+					for (int i = 0; i < idBoards.length; i++)
+					{
+						addBoardToSuggestedCombo(idBoards[i]);
+					}
+				}
 			}
 
 			@Override
@@ -538,7 +575,15 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		addFocusAndSelectionFieldsComboLisener(m_members, m_memberFieldsCombo);
 	}
 	
-	private void addUniqueMemberToSelectedMembersCombo (Member m)
+	private void addBoardToSuggestedCombo (String a_boardId)
+	{
+		Board board = client.getBoard(a_boardId);
+		String name = board.getName();
+		m_allSugBoards.add(board);
+		m_suggestedBoardsCombo.add(name);
+	}
+	
+	private void addUniqueMemberToSelectedCombo (Member m)
 	{
 		if (!m_allSelMembers.contains(m))
 		{
@@ -628,7 +673,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex() - 1;
-				m_oldValueComboText = m_selectedBoardsCombo.getText();///////////////////////////////////////////////////////
+				m_oldValueComboText = m_selectedBoardsCombo.getText();
 				/*m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex();
 				
 				m_sugMembers.clear();
@@ -709,7 +754,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_selectedListComboTextIndex = m_selectedListsCombo.getSelectionIndex();
-				m_oldValueComboText = m_selectedListsCombo.getText();///////////////////////////////////////////////////////
+				m_oldValueComboText = m_selectedListsCombo.getText();
 			}
 
 			@Override

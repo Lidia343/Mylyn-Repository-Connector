@@ -233,6 +233,24 @@ public class TrelloConnection implements ITrelloConnection
 	}
 
 	@Override
+	public Board getBoard (String a_boardId)
+	{
+		String line;
+		Board board = null;
+		try
+		{
+			line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "?key=" + m_key + "&token=" + m_token);
+			if(line != null)
+				board = m_gson.fromJson(line, Board.class);
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		return board;
+	}
+	
+	@Override
 	public List<Member> getMembers(List<String> a_boardIds) throws IOException
 	{
 		String line;
