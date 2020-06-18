@@ -45,8 +45,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String m_name = "Name:";
 	private final String m_url = "URL:";
 	private final String m_id = "ID:";
-	private final String m_all = "All";
-	private final String m_no = "No";
+	private final String m_all = "(All)";
+	private final String m_no = "(No)";
 	private final String m_calendar = "Select in calendar";
 	private final String m_nonArchCards = "Only non-archived cards";
 	private final String m_bothArchCards = "Archived and non-archived cards";
@@ -524,6 +524,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_selectedMemberComboTextIndex = m_selectedMembersCombo.getSelectionIndex() - 1;
+				m_oldValueComboText = m_selectedMembersCombo.getText();//////////////////////////////////////////////////////////////////////////
 			}
 
 			@Override
@@ -627,6 +628,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex() - 1;
+				m_oldValueComboText = m_selectedBoardsCombo.getText();///////////////////////////////////////////////////////
 				/*m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex();
 				
 				m_sugMembers.clear();
@@ -707,6 +709,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				m_selectedListComboTextIndex = m_selectedListsCombo.getSelectionIndex();
+				m_oldValueComboText = m_selectedListsCombo.getText();///////////////////////////////////////////////////////
 			}
 
 			@Override
