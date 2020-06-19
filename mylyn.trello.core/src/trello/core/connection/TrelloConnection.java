@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import trello.core.TrelloRepositoryConnector;
 import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
@@ -33,7 +34,7 @@ public class TrelloConnection implements ITrelloConnection
 {
 	private String m_key;
 	private String m_token;
-	private final String m_mainUrlPart = "https://api.trello.com/1/";
+	private final String m_mainUrlPart = TrelloRepositoryConnector.REPOSITORY_URL;
 	private Gson m_gson = (new GsonBuilder().create());
 	private final String encoding = "UTF-8";
 
@@ -54,9 +55,12 @@ public class TrelloConnection implements ITrelloConnection
 	}
 
 	@Override
-	public BoardList getBoardList() throws IOException
+	public BoardList getBoardList(boolean a_seeAlsoClosedBoards) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=all&board_fields=name,url,closed&key=" + m_key + "&token=" + m_token);
+		String filter = "open";
+		if (a_seeAlsoClosedBoards) filter = "all";
+		
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=" + filter + "&board_fields=name,url,closed&key=" + m_key + "&token=" + m_token);
 		BoardList boardList = null;
 		if(line != null)
 			boardList = m_gson.fromJson(line, BoardList.class);
@@ -64,10 +68,11 @@ public class TrelloConnection implements ITrelloConnection
 	}
 	
 	@Override
-	public List<CardList> getCardLists(String a_boardId) throws IOException
+	public List<CardList> getCardLists(String a_boardId, boolean a_seeAlsoClosedLists) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?cards=open&card_fields=name,desc,url,closed,due,dueComplete,dateLastActivity,idChecklists,idMembers&fields=name,closed&key=" 
-				                                 + m_key + "&token=" + m_token);
+		String filter = "filter=open&";
+		if (a_seeAlsoClosedLists) filter = "filter=all&";
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?" + filter + "key=" + m_key + "&token=" + m_token);
 		List<CardList> cardLists = null;
 		if(line != null)
 			cardLists = m_gson.fromJson(line, new TypeToken<List<CardList>>(){}.getType());
@@ -176,9 +181,9 @@ public class TrelloConnection implements ITrelloConnection
 	public List<Card> getAllCards() throws IOException
 	{
 		List<Card> cards = new ArrayList<>();
-		for (Board b : getBoardList().getBoards())
+		for (Board b : getBoardList(true).getBoards())
 		{
-			for (CardList l : getCardLists(b.getId()))
+			for (CardList l : getCardLists(b.getId(), true))
 			{
 				for (Card c : l.getCards())
 				{

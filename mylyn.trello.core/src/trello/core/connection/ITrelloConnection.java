@@ -44,7 +44,7 @@ public interface ITrelloConnection
 	 * @return объект класса BoardList, содержащий список досок
 	 * @throws IOException
 	 */
-	BoardList getBoardList() throws Exception;
+	BoardList getBoardList(boolean a_seeAlsoClosedBoards) throws Exception;
 
 	/**
 	 * Метод для получения списка списков карточек одной доски.
@@ -56,7 +56,7 @@ public interface ITrelloConnection
 	 *         карточек)
 	 * @throws IOException
 	 */
-	List<CardList> getCardLists(String a_boardId) throws Exception;
+	List<CardList> getCardLists(String a_boardId, boolean a_seeAlsoClosedLists) throws Exception;
 	
 	/**
 	 * @param a_cardId - id карточки

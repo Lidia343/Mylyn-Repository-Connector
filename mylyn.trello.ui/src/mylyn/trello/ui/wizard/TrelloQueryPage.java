@@ -48,10 +48,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String m_all = "(All)";
 	private final String m_no = "(No)";
 	private final String m_calendar = "Select in calendar";
-	private final String m_nonArchCards = "Only non-archived cards";
-	private final String m_bothArchCards = "Archived and non-archived cards";
-	private final String m_archCards = "Only archived cards";
-	private final String m_bothCompCards = "Completed and non-completed cards";
+	private final String m_nonClosedCards = "Only non-archived cards";
+	private final String m_closedAndNonClosedCards = "Archived and non-archived cards";
+	private final String m_closedCards = "Only archived cards";
+	private final String m_compAndNonCompCards = "Completed and non-completed cards";
 	private final String m_nonCompCards = "Only non-completed cards";
 	private final String m_compCards = "Only completed cards";
 	
@@ -59,8 +59,11 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String[] m_boardFiledSelections = {m_name, m_url, m_id};
 	private final String[] m_listFiledSelections = {m_name, m_id};
 	private final String[] m_dueSelections = {m_all, m_no, m_calendar};
-	private final String[] m_archiveSelections = {m_nonArchCards, m_bothArchCards,  m_archCards};
-	private final String[] m_completingSelections = { m_bothCompCards, m_nonCompCards, m_compCards};
+	private final String[] m_closingSelections = { m_nonClosedCards, m_closedAndNonClosedCards,  m_closedCards};
+	private final String[] m_completingSelections = {m_compAndNonCompCards, m_nonCompCards, m_compCards};
+	
+	private String[] m_nameOfListIds;
+	private String[] m_listIds;
 	
 	private String m_oldValueComboText = "";
 	private String m_oldFieldComboText = "";
@@ -86,10 +89,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private Button m_boardClearingButton;
 	private Button m_listClearingButton;
 	
-	private Button m_archivedBoardsButton;
-	private Button m_archivedListsButton;
+	private Button m_closedBoardsButton;
+	private Button m_closedListsButton;
 	
-	private Combo m_archivedCardSelectionsCombo;
+	private Combo m_closedCardSelectionsCombo;
 	private Combo m_completedCardSelectionsCombo;
 
 	private Combo m_dueDateCombo;
@@ -108,9 +111,14 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private List<Member> m_allSelMembers = new ArrayList<>();
 	private List<CardList> m_allSelLists = new ArrayList<>();
 	
+	private boolean m_seeAlsoClosedBoards = false;
+	private boolean m_seeAlsoClosedLists = false;
+	
 	private Shell m_parent;
 	private CalendarDialog m_calendarDialog;
 	private String m_dateAndTime = "";
+	
+	String m_queryUrl = "";
 	
 	public TrelloQueryPage(TaskRepository a_repository, IRepositoryQuery a_query)
 	{
@@ -122,7 +130,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	}
 	
 	@Override
-	protected void doRefreshControls()
+	protected void doRefreshControls ()
 	{
 		try
 		{
@@ -135,7 +143,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			clearCombo(m_boards, m_selectedBoardsCombo);
 			clearCombo(m_lists, m_selectedListsCombo);
 			
-			m_allSugBoards = client.getBoardList().getBoards();
+			m_allSugBoards = client.getBoardList(m_seeAlsoClosedBoards).getBoards();
 			List<String> boardIds = new ArrayList<>();
 			
 			for (Board b : m_allSugBoards)
@@ -169,14 +177,15 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	public void applyTo(@NonNull IRepositoryQuery a_query)
 	{
 		a_query.setUrl(getQueryUrl(getTaskRepository().getRepositoryUrl()));
+		
 		a_query.setSummary(getQueryTitle());
 
 	}
 
 	private String getQueryUrl(String a_repositoryUrl)
 	{
-		
-		return null;
+		m_queryUrl = a_repositoryUrl;
+		return m_queryUrl;
 	}
 
 	private void clearCombo(String a_comboName, Combo a_combo)
@@ -213,12 +222,12 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		clearCombo(m_boards, m_selectedBoardsCombo);
 		clearCombo(m_lists, m_selectedListsCombo);
 		
-		if (m_archivedBoardsButton.getSelection()) m_archivedBoardsButton.setSelection(false);
-		if (m_archivedListsButton.getSelection()) m_archivedListsButton.setSelection(false);
+		if (m_closedBoardsButton.getSelection()) m_closedBoardsButton.setSelection(false);
+		if (m_closedListsButton.getSelection()) m_closedListsButton.setSelection(false);
 		
 		m_dueDateCombo.setText(m_all);
-		m_archivedCardSelectionsCombo.setText(m_nonArchCards);
-		m_completedCardSelectionsCombo.setText(m_bothCompCards);
+		m_closedCardSelectionsCombo.setText(m_nonClosedCards);
+		m_completedCardSelectionsCombo.setText(m_compAndNonCompCards);
 		
 		if (!m_checkListMovingButton.getSelection()) m_checkListMovingButton.setSelection(true);
 	}
@@ -338,7 +347,6 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		return contain;
 	}
 	
-	//////////////////////////////////////////////////////////////////////////
 	private void addFocusComboListener (Combo a_combo)
 	{
 		a_combo.addFocusListener(new FocusListener() 
@@ -578,6 +586,9 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private void addBoardToSuggestedCombo (String a_boardId)
 	{
 		Board board = client.getBoard(a_boardId);
+		if (!m_seeAlsoClosedBoards)
+			if (Boolean.parseBoolean(board.getClosed()) == true)
+				return;
 		String name = board.getName();
 		m_allSugBoards.add(board);
 		m_suggestedBoardsCombo.add(name);
@@ -668,7 +679,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 						boolean contain;
 						for (Board b : m_allSelBoards)
 						{
-							lists = client.getCardLists(b.getId());
+							lists = client.getCardLists(b.getId(), m_seeAlsoClosedLists);
 							
 							for (CardList l : lists)
 							{
@@ -685,7 +696,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 					else
 					{
 						Board b = m_allSelBoards.get(m_selectedBoardComboTextIndex);
-						lists = client.getCardLists(b.getId());
+						lists = client.getCardLists(b.getId(), m_seeAlsoClosedLists);
 						for (CardList l : lists)
 						{
 							addListToSuggestedCombo(l);
@@ -773,8 +784,24 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			@Override
 			public void widgetSelected(SelectionEvent a_e)
 			{
-				m_selectedListComboTextIndex = m_selectedListsCombo.getSelectionIndex();
+				int selectionIndex = m_selectedListsCombo.getSelectionIndex() - 1;
+				if (selectionIndex != -1)
+					if (selectionIndex == m_selectedListComboTextIndex) return;
+				
+				m_selectedListComboTextIndex = selectionIndex;
 				m_oldValueComboText = m_selectedListsCombo.getText();
+				
+				if (m_selectedListsCombo.getText().equals(m_all))
+				{
+					for (CardList l : m_allSelLists)
+					{
+						
+					}
+				}
+				else
+				{
+					
+				}
 			}
 
 			@Override
@@ -802,15 +829,57 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private void createArchivedGroup ()
 	{
-		m_archivedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
+		m_closedBoardsButton = new Button (m_baseComposite, SWT.CHECK);
 		GridData g = createGridData (SWT.RIGHT, false, 5);
-		m_archivedBoardsButton.setLayoutData(g);
-		m_archivedBoardsButton.setText("See also archived boards");
+		m_closedBoardsButton.setLayoutData(g);
+		m_closedBoardsButton.setText("See also archived boards");
 		
-		m_archivedListsButton = new Button (m_baseComposite, SWT.CHECK);
+		m_closedListsButton = new Button (m_baseComposite, SWT.CHECK);
 		g = createGridData (SWT.RIGHT, false, 5);
-		m_archivedListsButton.setLayoutData(g);
-		m_archivedListsButton.setText("See also archived lists");
+		m_closedListsButton.setLayoutData(g);
+		m_closedListsButton.setText("See also archived lists");
+		
+		m_closedBoardsButton.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent a_e)
+			{
+				if (m_closedBoardsButton.getSelection() == true)
+					m_seeAlsoClosedBoards = true;
+				else
+					m_seeAlsoClosedBoards = false;
+				doRefreshControls();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent a_e)
+			{
+			}
+		});
+		
+		m_closedListsButton.addSelectionListener(new SelectionListener() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent a_e)
+			{
+				if (m_closedListsButton.getSelection() == true)
+					m_seeAlsoClosedLists = true;
+				else
+					m_seeAlsoClosedLists = false;
+				
+				//////////////////////////////////////////////////////////////////////////////////////////////////////
+				m_allSugLists.clear();
+				m_suggestedListsCombo.removeAll();
+				m_allSelLists.clear();
+				m_selectedListsCombo.removeAll();
+				
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent a_e)
+			{
+			}
+		});
 	}
 	
 	private void setCombo(Combo a_combo, GridData a_g, String[] a_fieldsForAdding)
@@ -849,8 +918,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_dueDateCombo = new Combo(dueComposite, SWT.DROP_DOWN);
 		setCombo(m_dueDateCombo, g, m_dueSelections);
 		
-		m_archivedCardSelectionsCombo = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
-		setCombo(m_archivedCardSelectionsCombo, g, m_archiveSelections);
+		m_closedCardSelectionsCombo = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
+		setCombo(m_closedCardSelectionsCombo, g, m_closingSelections);
 		
 		m_completedCardSelectionsCombo = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
 		setCombo(m_completedCardSelectionsCombo, g, m_completingSelections);
@@ -867,7 +936,6 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void finish(String a_result)
 			{
 				m_dateAndTime = a_result;
-				System.out.println(m_dateAndTime);
 			}
 		};
 		
