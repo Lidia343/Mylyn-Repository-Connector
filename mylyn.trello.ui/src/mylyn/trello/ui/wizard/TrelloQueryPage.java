@@ -746,6 +746,20 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			{
 				m_oldValueComboText =  m_suggestedListsCombo.getText();
 				
+				addDefaultItemIfComboIsEmpty (m_selectedListsCombo);
+				
+				if (m_suggestedListsCombo.getText().equals(m_all))
+				{
+					for (CardList l : m_allSugLists)
+					{
+						addUniqueListToSelectedCombo(l);
+					}
+				}
+				else
+				{
+					CardList l = m_allSugLists.get(m_suggestedListsCombo.getSelectionIndex() - 1);
+					addUniqueListToSelectedCombo(l);
+				}
 			}
 
 			@Override
@@ -772,6 +786,18 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		addFocusComboListener(m_suggestedListsCombo);
 		addFocusComboListener(m_selectedListsCombo);
 		addFocusAndSelectionFieldsComboLisener(m_lists, m_listFieldsCombo);
+	}
+	
+	private void addUniqueListToSelectedCombo (CardList a_l)
+	{
+		if (!m_allSelLists.contains(a_l))
+		{
+			m_allSelLists.add(a_l);
+			
+			String listFieldText = m_listFieldsCombo.getText();
+			if (listFieldText.equals(m_id)) m_selectedListsCombo.add(a_l.getId());
+			if (listFieldText.equals(m_name)) m_selectedListsCombo.add(a_l.getName());
+		}
 	}
 	
 	private void createArchivedGroup ()
