@@ -1,5 +1,6 @@
 package mylyn.trello.ui.wizard;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,8 +103,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private List<Member> m_allSugMembers = new ArrayList<>();
 	private List<Board> m_allSugBoards;
-	//private List<Member> m_sugMembers = new ArrayList<>();
-	//private List<CardList> m_allSugLists = new ArrayList<>();
+	private List<CardList> m_allSugLists = new ArrayList<>();
 	
 	private List<Board> m_allSelBoards = new ArrayList<>();
 	private List<Member> m_allSelMembers = new ArrayList<>();
@@ -649,44 +649,52 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			@Override
 			public void widgetSelected(SelectionEvent a_e)
 			{
-				m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex() - 1;
+				int selectionIndex = m_selectedBoardsCombo.getSelectionIndex() - 1;
+				if (selectionIndex == m_selectedBoardComboTextIndex) return;
+				
+				m_selectedBoardComboTextIndex = selectionIndex;
 				m_oldValueComboText = m_selectedBoardsCombo.getText();
-				/*m_selectedBoardComboTextIndex = m_selectedBoardsCombo.getSelectionIndex();
 				
-				m_sugMembers.clear();
-				m_suggestedMembersCombo.removeAll();
-				//List<Member> members = m_allSugMembers.get(m_allSelBoards.get(m_selectedBoardsCombo.getSelectionIndex()).getId());
-				List<Member> members = new ArrayList<>();
-				
-				for (Member m : members)
+				m_allSugLists.clear();
+				m_suggestedListsCombo.removeAll();
+				m_suggestedListsCombo.add(m_defaultTrelloObjectSelectionText);
+
+				try
 				{
-					for (Member u : m_sugMembers)
+					List<CardList> lists;
+					if (m_selectedBoardsCombo.getText().equals(m_defaultTrelloObjectSelectionText))
 					{
-						if (m.getId().equals(u.getId())) return;
+						boolean contain;
+						for (Board b : m_allSelBoards)
+						{
+							lists = client.getCardLists(b.getId());
+							
+							for (CardList l : lists)
+							{
+								contain = false;
+								for (CardList c : m_allSugLists)
+								{
+									if (l.getId().equals(c.getId())) contain = true;
+								}
+								
+								if (!contain) addListToSuggestedCombo(l);
+							}
+						}
 					}
-					
-					m_sugMembers.add(m);
-					
-					String memberFieldText = m_memberFieldsCombo.getText();
-					
-					if (memberFieldText.equals(m_fullName))
+					else
 					{
-						m_suggestedMembersCombo.add(m.getFullName());
-						m_suggestedMembersCombo.setText(m.getFullName());
+						Board b = m_allSelBoards.get(m_selectedBoardComboTextIndex);
+						lists = client.getCardLists(b.getId());
+						for (CardList l : lists)
+						{
+							addListToSuggestedCombo(l);
+						}
 					}
-					
-					if (memberFieldText.equals(m_username))
-					{
-						m_suggestedMembersCombo.add(m.getUsername());
-						m_suggestedMembersCombo.setText(m.getUsername());
-					}
-						
-					if (memberFieldText.equals(m_email))
-					{
-						m_suggestedMembersCombo.add(m.getEmail());
-						m_suggestedMembersCombo.setText(m.getEmail());
-					}
-				}*/
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 
 			@Override
@@ -711,6 +719,13 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			if (boardFieldText.equals(m_name)) m_selectedBoardsCombo.add(a_b.getName());
 			if (boardFieldText.equals(m_url))  m_selectedBoardsCombo.add(a_b.getUrl());
 		}
+	}
+	
+	private void addListToSuggestedCombo (CardList a_l)
+	{
+		String name = a_l.getName();
+		m_allSugLists.add(a_l);
+		m_suggestedListsCombo.add(name);
 	}
 	
 	private void createListGroup()
