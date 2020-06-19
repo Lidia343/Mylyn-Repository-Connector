@@ -524,7 +524,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				int selectionIndex = m_selectedMembersCombo.getSelectionIndex() - 1;
-				if (selectionIndex == m_selectedMemberComboTextIndex) return;
+				if (selectionIndex != -1)
+					if (selectionIndex == m_selectedMemberComboTextIndex) return;
 				
 				m_selectedMemberComboTextIndex = selectionIndex;
 				m_oldValueComboText = m_selectedMembersCombo.getText();
@@ -650,7 +651,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetSelected(SelectionEvent a_e)
 			{
 				int selectionIndex = m_selectedBoardsCombo.getSelectionIndex() - 1;
-				if (selectionIndex == m_selectedBoardComboTextIndex) return;
+				if (selectionIndex != -1)
+					if (selectionIndex == m_selectedBoardComboTextIndex) return;
 				
 				m_selectedBoardComboTextIndex = selectionIndex;
 				m_oldValueComboText = m_selectedBoardsCombo.getText();
