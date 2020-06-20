@@ -116,7 +116,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private Shell m_parent;
 	private CalendarDialog m_calendarDialog;
-	private String m_dateAndTime = "";
+	private String m_dateAndTime = m_all;
 	
 	String m_queryUrl = "";
 	
@@ -952,6 +952,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				if (m_dueDateCombo.getText().equals(m_calendar) && (m_calendarDialog == null || m_calendarDialog.isDisposed()))
 				{
 					m_calendarDialog = new CalendarDialog (m_parent, m_handler);
+				}
+				else
+				{
+					m_dateAndTime = m_dueDateCombo.getText();
 				}
 			}
 
