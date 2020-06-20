@@ -2,7 +2,6 @@ package trello.core;
 
 import java.io.IOException;
 import java.util.Date;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -30,6 +29,21 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public final static String CONNECTOR_KIND = "trello";
 	public final static String REPOSITORY_URL = "https://trello.com/1/";
 	public final static String REPOSITORY_LABEL = "Trello.com";
+	
+	public final static String LIST_ID_NUMBERS_QUERY_KEY = "listIdNumbers";
+	public final static String LIST_ID_QUERY_KEY = "listId";
+	public final static String DUE_QUERY_KEY = "due";
+	public final static String CLOSED_QUERY_KEY = "closed";
+	public final static String COMPLETED_QUERY_KEY = "completed";
+	public final static String CHECKLISTS_QUERY_KEY = "checklists";
+	
+	public final static String NON_CLOSED_CARDS = "Only non-archived cards";
+	public final static String CLOSED_AND_NON_CLOSED_CARDS = "Archived and non-archived cards";
+	public final static String CLOSED_CARDS = "Only archived cards";
+	public final static String COMPLETED_AND_NON_COMPLETED_CARDS = "Completed and non-completed cards";
+	public final static String NON_COMPLETED_CARDS = "Only non-completed cards";
+	public final static String COMPLETED_CARDS = "Only completed cards";
+	
 	private final TrelloTaskDataHandler m_taskDataHandler = new TrelloTaskDataHandler();
 	
 	//private final String taskKeyUpdateDate = "UpdateDate";
@@ -180,6 +194,16 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public IStatus performQuery(@NonNull TaskRepository a_repository, @NonNull IRepositoryQuery a_query, @NonNull TaskDataCollector a_collector, 
 			                    @Nullable ISynchronizationSession a_session, IProgressMonitor a_monitor)
 	{
+		int listIdNumbers = Integer.parseInt(a_query.getAttribute(LIST_ID_NUMBERS_QUERY_KEY));
+		
+		for (int i = 0; i < listIdNumbers; i++)
+		{
+			System.out.println(a_query.getAttribute(LIST_ID_QUERY_KEY + Integer.toString(i)));
+		}
+		System.out.println(a_query.getAttribute(DUE_QUERY_KEY));
+		System.out.println(a_query.getAttribute(COMPLETED_QUERY_KEY));
+		System.out.println(a_query.getAttribute(CLOSED_QUERY_KEY));
+		System.out.println(a_query.getAttribute(CHECKLISTS_QUERY_KEY));
 		/*try
 		{
 			//System.out.println(a_query.toString());
