@@ -2,9 +2,6 @@ package trello.core;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,7 +16,6 @@ import org.eclipse.mylyn.tasks.core.ITask;
 //import org.eclipse.mylyn.tasks.core.ITaskComment;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 //import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
-import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
@@ -32,7 +28,7 @@ import trello.core.util.TrelloUtil;
 public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 {
 	public final static String CONNECTOR_KIND = "trello";
-	public final static String REPOSITORY_URL = "https://trello.com";
+	public final static String REPOSITORY_URL = "https://trello.com/1/";
 	public final static String REPOSITORY_LABEL = "Trello.com";
 	private final TrelloTaskDataHandler m_taskDataHandler = new TrelloTaskDataHandler();
 	
