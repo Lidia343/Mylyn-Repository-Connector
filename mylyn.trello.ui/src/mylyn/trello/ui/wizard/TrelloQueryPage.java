@@ -937,9 +937,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		FinishHandler m_handler = new FinishHandler () 
 		{
 			@Override
-			public void finish(String a_result)
+			public void finish(String a_trelloDateAndTime, String a_mylynDateAndTime)
 			{
-				m_dateAndTime = a_result;
+				m_dateAndTime = a_trelloDateAndTime;
+				m_dueDateCombo.setText(a_mylynDateAndTime);
 			}
 		};
 		

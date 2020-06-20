@@ -39,6 +39,6 @@ public class TrelloUtil
 		a_hours -= 3;
 		if (a_hours < 0)
 			a_hours = a_hours + 24;
-		return Integer.toString(a_hours);
+		return redactTimePart(a_hours);
 	}
 }
