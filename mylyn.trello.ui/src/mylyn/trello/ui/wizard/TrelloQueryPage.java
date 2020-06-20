@@ -29,6 +29,7 @@ import trello.core.connection.TrelloConnection;
 import trello.core.model.Board;
 import trello.core.model.CardList;
 import trello.core.model.Member;
+import trello.core.util.TrelloUtil;
 
 public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 {
@@ -54,6 +55,14 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String m_compAndNonCompCards = "Completed and non-completed cards";
 	private final String m_nonCompCards = "Only non-completed cards";
 	private final String m_compCards = "Only completed cards";
+	
+	private final static int CLOSED_CARDS = 0;
+	private final static int NON_CLOSED_CARDS = 1;
+	private final static int CLOSED_AND_NON_CLOSED_CARDS = 2;
+	
+	private final static int COMPLETED_CARDS = 3;
+	private final static int NON_COMPLETED_CARDS = 4;
+	private final static int COMPLETED_AND_NON_COMPLETED_CARDS = 5;
 	
 	private final String[] m_memberFiledSelections = {m_fullName, m_username, m_email};
 	private final String[] m_boardFiledSelections = {m_name, m_url, m_id};
@@ -97,7 +106,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 
 	private Combo m_dueDateCombo;
 	
-	private Button m_checkListMovingButton;
+	private Button m_checklistMovingButton;
 	
 	private int m_selectedMemberComboTextIndex = -1;
 	private int m_selectedBoardComboTextIndex = -1;
@@ -117,6 +126,11 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private Shell m_parent;
 	private CalendarDialog m_calendarDialog;
 	private String m_dateAndTime = m_all;
+	
+	private int m_closedCardSelection = NON_CLOSED_CARDS;
+	private int m_completedCardSelection = COMPLETED_AND_NON_COMPLETED_CARDS;
+	
+	private boolean m_moveChecklists = true;
 	
 	String m_queryUrl = "";
 	
@@ -222,14 +236,11 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		clearCombo(m_boards, m_selectedBoardsCombo);
 		clearCombo(m_lists, m_selectedListsCombo);
 		
-		if (m_closedBoardsButton.getSelection()) m_closedBoardsButton.setSelection(false);
-		if (m_closedListsButton.getSelection()) m_closedListsButton.setSelection(false);
-		
-		m_dueDateCombo.setText(m_all);
-		m_closedCardSelectionsCombo.setText(m_nonClosedCards);
-		m_completedCardSelectionsCombo.setText(m_compAndNonCompCards);
-		
-		if (!m_checkListMovingButton.getSelection()) m_checkListMovingButton.setSelection(true);
+		if (!TrelloUtil.contains(m_dueDateCombo.getText(), m_dueDateCombo.getItems())) 
+		{
+			m_dueDateCombo.setText(m_all);
+			m_dateAndTime = m_all;
+		}
 	}
 	
 	@Override
@@ -327,24 +338,11 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		return listener;
 	}
 	
-	private boolean setOldTextOnCombo (Combo a_combo, String a_text)
+	private void setOldTextOnCombo (Combo a_combo, String a_oldText)
 	{
-		boolean contain = false;
-		String text = a_combo.getText();
-		
-		for (String s : a_combo.getItems())
-		{
-			if (text.equals(s))
-			{
-				contain = true;
-				break;
-			}
-		}
-		if (!contain)
-		{
-			a_combo.setText(a_text);
-		}
-		return contain;
+		String newText = a_combo.getText();
+		if (!TrelloUtil.contains(newText, a_combo.getItems()))
+			a_combo.setText(a_oldText);
 	}
 	
 	private void addFocusComboListener (Combo a_combo)
@@ -928,11 +926,11 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_completedCardSelectionsCombo = new Combo(m_cardParametersComposite, SWT.DROP_DOWN);
 		setCombo(m_completedCardSelectionsCombo, g, m_completingSelections);
 		
-		m_checkListMovingButton = new Button (m_cardParametersComposite, SWT.CHECK);
+		m_checklistMovingButton = new Button (m_cardParametersComposite, SWT.CHECK);
 		g = createGridData (SWT.RIGHT, false, 2);
-		m_checkListMovingButton.setLayoutData(g);
-		m_checkListMovingButton.setText("Also move check-lists if they exist");
-		m_checkListMovingButton.setSelection(true);
+		m_checklistMovingButton.setLayoutData(g);
+		m_checklistMovingButton.setText("Also move checklists if they exist");
+		m_checklistMovingButton.setSelection(true);
 		
 		FinishHandler m_handler = new FinishHandler () 
 		{
@@ -963,6 +961,70 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			public void widgetDefaultSelected(SelectionEvent a_e)
 			{
 				
+			}
+		});
+		
+		addFocusComboListener(m_closedCardSelectionsCombo);
+		addFocusComboListener(m_completedCardSelectionsCombo);
+		
+		m_closedCardSelectionsCombo.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				String text = m_closedCardSelectionsCombo.getText();
+				if (text.equals(m_closedCards))
+					m_closedCardSelection = CLOSED_CARDS;
+				
+				if (text.equals(m_nonClosedCards))
+					m_closedCardSelection = NON_CLOSED_CARDS;
+				
+				if (text.equals(m_closedAndNonClosedCards))
+					m_closedCardSelection = CLOSED_AND_NON_CLOSED_CARDS;
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+			}
+		});
+		
+		m_completedCardSelectionsCombo.addSelectionListener(new SelectionListener() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				String text = m_completedCardSelectionsCombo.getText();
+				if (text.equals(m_compCards))
+					m_completedCardSelection = COMPLETED_CARDS;
+				
+				if (text.equals(m_nonCompCards))
+					m_completedCardSelection = NON_COMPLETED_CARDS;
+				
+				if (text.equals(m_compAndNonCompCards))
+					m_completedCardSelection = COMPLETED_AND_NON_COMPLETED_CARDS;
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+			}
+		});
+		
+		m_checklistMovingButton.addSelectionListener(new SelectionListener() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				if (m_checklistMovingButton.getSelection() == true)
+					m_moveChecklists = true;
+				else
+					m_moveChecklists = false;
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
 			}
 		});
 	}
