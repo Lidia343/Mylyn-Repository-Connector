@@ -667,46 +667,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				m_selectedBoardComboTextIndex = selectionIndex;
 				m_oldValueComboText = m_selectedBoardsCombo.getText();
 				
-				m_allSugLists.clear();
-				m_suggestedListsCombo.removeAll();
-				m_suggestedListsCombo.add(m_all);
-
-				try
-				{
-					List<CardList> lists;
-					if (m_selectedBoardsCombo.getText().equals(m_all))
-					{
-						boolean contain;
-						for (Board b : m_allSelBoards)
-						{
-							lists = client.getCardLists(b.getId(), m_seeAlsoClosedLists);
-							
-							for (CardList l : lists)
-							{
-								contain = false;
-								for (CardList c : m_allSugLists)
-								{
-									if (l.getId().equals(c.getId())) contain = true;
-								}
-								
-								if (!contain) addListToSuggestedCombo(l);
-							}
-						}
-					}
-					else
-					{
-						Board b = m_allSelBoards.get(m_selectedBoardComboTextIndex);
-						lists = client.getCardLists(b.getId(), m_seeAlsoClosedLists);
-						for (CardList l : lists)
-						{
-							addListToSuggestedCombo(l);
-						}
-					}
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
+				refreshListGroup();
 			}
 
 			@Override
@@ -718,6 +679,52 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		addFocusComboListener(m_suggestedBoardsCombo);
 		addFocusComboListener(m_selectedBoardsCombo);
 		addFocusAndSelectionFieldsComboLisener(m_boards, m_boardFieldsCombo);
+	}
+	
+	private void refreshListGroup ()
+	{
+		m_allSugLists.clear();
+		m_suggestedListsCombo.removeAll();
+		m_suggestedListsCombo.add(m_all);
+
+		try
+		{
+			List<CardList> lists;
+			if (m_selectedBoardsCombo.getText().equals(m_all))
+			{
+				boolean contain;
+				for (Board b : m_allSelBoards)
+				{
+					lists = client.getCardLists(b.getId(), m_seeAlsoClosedLists);
+					
+					for (CardList l : lists)
+					{
+						contain = false;
+						for (CardList c : m_allSugLists)
+						{
+							if (l.getId().equals(c.getId())) contain = true;
+						}
+						
+						if (!contain) addListToSuggestedCombo(l);
+					}
+				}
+			}
+			else
+			{
+				if (m_selectedBoardComboTextIndex == -1) return;
+				Board b = m_allSelBoards.get(m_selectedBoardComboTextIndex);
+				lists = client.getCardLists(b.getId(), m_seeAlsoClosedLists);
+				for (CardList l : lists)
+				{
+					addListToSuggestedCombo(l);
+				}
+			}
+			if (m_suggestedListsCombo.getItemCount() == 1) m_suggestedListsCombo.removeAll();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	private void addUniqueBoardToSelectedCombo (Board a_b)
@@ -867,12 +874,9 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				else
 					m_seeAlsoClosedLists = false;
 				
-				//////////////////////////////////////////////////////////////////////////////////////////////////////
-				m_allSugLists.clear();
-				m_suggestedListsCombo.removeAll();
 				m_allSelLists.clear();
 				m_selectedListsCombo.removeAll();
-				
+				refreshListGroup();
 			}
 
 			@Override
