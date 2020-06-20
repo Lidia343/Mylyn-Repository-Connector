@@ -47,14 +47,12 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private final String m_name = "Name:";
 	private final String m_url = "URL:";
 	private final String m_id = "ID:";
-	private final String m_all = "(All)";
-	private final String m_no = "(No)";
 	private final String m_calendar = "Select in calendar";
 	
 	private final String[] m_memberFiledSelections = {m_fullName, m_username, m_email};
 	private final String[] m_boardFiledSelections = {m_name, m_url, m_id};
 	private final String[] m_listFiledSelections = {m_name, m_id};
-	private final String[] m_dueSelections = {m_all, m_no, m_calendar};
+	private final String[] m_dueSelections = {TrelloRepositoryConnector.ALL, TrelloRepositoryConnector.NO, m_calendar};
 	private final String[] m_closingSelections = {TrelloRepositoryConnector.NON_CLOSED_CARDS, TrelloRepositoryConnector.CLOSED_AND_NON_CLOSED_CARDS,  TrelloRepositoryConnector.CLOSED_CARDS};
 	private final String[] m_completingSelections = {TrelloRepositoryConnector.COMPLETED_AND_NON_COMPLETED_CARDS, TrelloRepositoryConnector.NON_COMPLETED_CARDS, TrelloRepositoryConnector.COMPLETED_CARDS};
 	
@@ -112,7 +110,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private Shell m_parent;
 	private CalendarDialog m_calendarDialog;
-	private String m_dueDateAndTime = m_all;
+	private String m_dueDateAndTime = TrelloRepositoryConnector.ALL;
 	
 	String m_queryUrl = "";
 	
@@ -133,7 +131,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			clearCombo(m_suggestedBoardsCombo);
 			clearCombo(m_suggestedListsCombo);
 			clearCombo(m_suggestedMembersCombo);
-			m_suggestedMembersCombo.add(m_all);
+			m_suggestedMembersCombo.add(TrelloRepositoryConnector.ALL);
 			
 			clearCombo(m_members, m_selectedMembersCombo);
 			clearCombo(m_boards, m_selectedBoardsCombo);
@@ -237,8 +235,8 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		
 		if (!TrelloUtil.contains(m_dueDateCombo.getText(), m_dueDateCombo.getItems())) 
 		{
-			m_dueDateCombo.setText(m_all);
-			m_dueDateAndTime = m_all;
+			m_dueDateCombo.setText(TrelloRepositoryConnector.ALL);
+			m_dueDateAndTime = TrelloRepositoryConnector.ALL;
 		}
 	}
 	
@@ -475,7 +473,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private void setItemAndText (Combo a_combo, String a_item, int a_id, int a_index)
 	{
 		if (a_item.equals(""))
-			a_item = m_no;
+			a_item = TrelloRepositoryConnector.NO;
 		
 		a_combo.setItem(a_id + 1, a_item);
 		if (a_id == a_index)
@@ -502,7 +500,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				
 				addDefaultItemIfComboIsEmpty (m_selectedMembersCombo);
 				
-				if (m_suggestedMembersCombo.getText().equals(m_all))
+				if (m_suggestedMembersCombo.getText().equals(TrelloRepositoryConnector.ALL))
 				{
 					for (Member m : m_allSugMembers)
 					{
@@ -536,10 +534,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				
 				m_allSugBoards.clear();
 				m_suggestedBoardsCombo.removeAll();
-				m_suggestedBoardsCombo.add(m_all);
+				m_suggestedBoardsCombo.add(TrelloRepositoryConnector.ALL);
 
 				String[] idBoards;
-				if (m_selectedMembersCombo.getText().equals(m_all))
+				if (m_selectedMembersCombo.getText().equals(TrelloRepositoryConnector.ALL))
 				{
 					boolean contain;
 					for (Member m : m_allSelMembers)
@@ -602,7 +600,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			if (memberFieldText.equals(m_username)) m_selectedMembersCombo.add(m.getUsername());
 			if (memberFieldText.equals(m_email)) 
 			{
-				if (m.getEmail().equals("")) m_selectedMembersCombo.add(m_no);
+				if (m.getEmail().equals("")) m_selectedMembersCombo.add(TrelloRepositoryConnector.NO);
 				else m_selectedMembersCombo.add(m.getEmail());
 			}
 		}
@@ -610,7 +608,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	
 	private void addDefaultItemIfComboIsEmpty (Combo a_combo)
 	{
-		if (a_combo.getItemCount() == 0) a_combo.add(m_all); 
+		if (a_combo.getItemCount() == 0) a_combo.add(TrelloRepositoryConnector.ALL); 
 	}
 	
 	private void createBoardGroup()
@@ -632,7 +630,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 				
 				addDefaultItemIfComboIsEmpty (m_selectedBoardsCombo);
 				
-				if (m_suggestedBoardsCombo.getText().equals(m_all))
+				if (m_suggestedBoardsCombo.getText().equals(TrelloRepositoryConnector.ALL))
 				{
 					for (Board b : m_allSugBoards)
 					{
@@ -682,12 +680,12 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	{
 		m_allSugLists.clear();
 		m_suggestedListsCombo.removeAll();
-		m_suggestedListsCombo.add(m_all);
+		m_suggestedListsCombo.add(TrelloRepositoryConnector.ALL);
 
 		try
 		{
 			List<CardList> lists;
-			if (m_selectedBoardsCombo.getText().equals(m_all))
+			if (m_selectedBoardsCombo.getText().equals(TrelloRepositoryConnector.ALL))
 			{
 				boolean contain;
 				for (Board b : m_allSelBoards)
@@ -761,7 +759,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			{
 				m_oldValueComboText =  m_suggestedListsCombo.getText();
 				
-				if (m_suggestedListsCombo.getText().equals(m_all))
+				if (m_suggestedListsCombo.getText().equals(TrelloRepositoryConnector.ALL))
 				{
 					for (CardList l : m_allSugLists)
 						addUniqueListToSelectedCombo(l);

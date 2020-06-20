@@ -38,6 +38,8 @@ public interface ITrelloConnection
 	 */
 	Member getMemberData() throws Exception;
 
+	List<Card> getCards (String a_listId, String a_closed) throws Exception;
+	
 	/**
 	 * Метод для получения списка досок.
 	 * 

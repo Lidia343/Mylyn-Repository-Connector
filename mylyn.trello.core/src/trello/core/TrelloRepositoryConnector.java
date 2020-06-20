@@ -1,7 +1,12 @@
 package trello.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -14,6 +19,7 @@ import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 //import org.eclipse.mylyn.tasks.core.ITaskComment;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 //import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
@@ -43,6 +49,9 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public final static String COMPLETED_AND_NON_COMPLETED_CARDS = "Completed and non-completed cards";
 	public final static String NON_COMPLETED_CARDS = "Only non-completed cards";
 	public final static String COMPLETED_CARDS = "Only completed cards";
+	
+	public final static String ALL = "(All)";
+	public final static String NO = "(No)";
 	
 	private final TrelloTaskDataHandler m_taskDataHandler = new TrelloTaskDataHandler();
 	
@@ -195,28 +204,62 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			                    @Nullable ISynchronizationSession a_session, IProgressMonitor a_monitor)
 	{
 		int listIdNumbers = Integer.parseInt(a_query.getAttribute(LIST_ID_NUMBERS_QUERY_KEY));
+		List<String> listIds = new ArrayList<>();
 		
 		for (int i = 0; i < listIdNumbers; i++)
 		{
-			System.out.println(a_query.getAttribute(LIST_ID_QUERY_KEY + Integer.toString(i)));
+			listIds.add(a_query.getAttribute(LIST_ID_QUERY_KEY + Integer.toString(i)));
+			//System.out.println();
 		}
-		System.out.println(a_query.getAttribute(DUE_QUERY_KEY));
-		System.out.println(a_query.getAttribute(COMPLETED_QUERY_KEY));
-		System.out.println(a_query.getAttribute(CLOSED_QUERY_KEY));
-		System.out.println(a_query.getAttribute(CHECKLISTS_QUERY_KEY));
-		/*try
+	//	System.out.println(a_query.getAttribute(DUE_QUERY_KEY));
+	//	System.out.println(a_query.getAttribute(COMPLETED_QUERY_KEY));
+	//	System.out.println(a_query.getAttribute(CLOSED_QUERY_KEY));
+	//	System.out.println(a_query.getAttribute(CHECKLISTS_QUERY_KEY));
+		try
 		{
-			//System.out.println(a_query.toString());
-			a_monitor.beginTask("Main task", IProgressMonitor.UNKNOWN);
+			a_monitor.beginTask("Querying repository", IProgressMonitor.UNKNOWN);
 			ITrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
-			System.out.println(client.doAuth());//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
 			Map<String, ITask> taskById = new HashMap<String, ITask>();
 			Card temp;
-			for (Card card : client.getAllCards())
+			List<Card> cards = new ArrayList<>();
+			for (String id : listIds)
 			{
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				//showCardInfo(card);
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				for (Card c : client.getCards(id, a_query.getAttribute(CLOSED_QUERY_KEY)))
+				{
+					if (a_query.getAttribute(DUE_QUERY_KEY).equals(NO))
+					{
+						if (c.getDue() != null) //////////////////////////////////////////
+							continue;
+					}
+					if (!a_query.getAttribute(DUE_QUERY_KEY).equals(ALL))
+					{
+						if (!c.getDue().equals(a_query.getAttribute(DUE_QUERY_KEY)))
+							continue;
+					}
+					if (a_query.getAttribute(COMPLETED_QUERY_KEY).equals(COMPLETED_CARDS))
+					{
+						if (Boolean.parseBoolean(c.getDueComplete()) == false)
+							continue;
+					}
+					if (a_query.getAttribute(COMPLETED_QUERY_KEY).equals(NON_COMPLETED_CARDS))
+					{
+						if (Boolean.parseBoolean(c.getDueComplete()) == true)
+							continue;
+					}
+					if (Boolean.parseBoolean(a_query.getAttribute(CHECKLISTS_QUERY_KEY)) == false)
+					{
+						c.setIdChecklists(null);
+					}
+					
+					cards.add(c);
+				}
+			}
+			
+			for (Card card : cards)
+			{
+				showCardInfo(card);
+
 				TaskData taskData = new TaskData(new TaskAttributeMapper(a_repository), a_repository.getConnectorKind(), a_repository.getRepositoryUrl(), card.getId());
 				taskData.setPartial(true);
 				//ITaskComment taskComment = new Comment(a_repository, null);//taskData.getAttributeMapper().createTaskAttachment(taskData)
@@ -228,6 +271,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 					temp = client.getCardById(task.getTaskId());
 					task.setSummary(temp.getName());
 					task.setUrl(temp.getUrl());
+					//task.setDueDate(temp.getDue());
 					task.setOwner(a_repository.getUserName());
 					if (taskById == null)                                                                                                                                                                                                                                                        //if (task.getTaskId() != null && !task.getTaskId().equals("") &&)
 					{
@@ -252,8 +296,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		finally
 		{
 			a_monitor.done();
-		}*/
-		return Status.OK_STATUS;
+		}
 	}
 	
 	private void showCardInfo(Card temp)
@@ -263,14 +306,12 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 		System.out.println(temp.getDesc());
 		System.out.println(temp.getUrl());
 		System.out.println(temp.getClosed());
+		if (temp.getDue() == null) System.out.println ("due = null"); else
 		System.out.println(temp.getDue());
 		System.out.println(temp.getDueComplete());
 		System.out.println(temp.getDateLastActivity());
+		if (temp.getIdChecklists() != null)
 		for (String s : temp.getIdChecklists())
-		{
-			System.out.println(s);
-		}
-		for (String s : temp.getIdMembers())
 		{
 			System.out.println(s);
 		}

@@ -1,5 +1,7 @@
 package trello.core.model;
 
+import java.util.Date;
+
 /**
  * Класс необходим для хранения информации о карточке.
  */

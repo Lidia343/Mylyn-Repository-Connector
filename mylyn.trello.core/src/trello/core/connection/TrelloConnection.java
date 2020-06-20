@@ -37,6 +37,11 @@ public class TrelloConnection implements ITrelloConnection
 	private final String m_mainUrlPart = TrelloRepositoryConnector.REPOSITORY_URL;
 	private Gson m_gson = (new GsonBuilder().create());
 	private final String encoding = "UTF-8";
+	
+	private final String m_allFilter = "filter=all&";
+	private final String m_closedFilter = "filter=closed&";
+	private final String m_openFilter = "filter=open&";
+	
 
 	public TrelloConnection(String a_key, String a_token)
 	{
@@ -52,6 +57,20 @@ public class TrelloConnection implements ITrelloConnection
 		if(line != null)
 			user = m_gson.fromJson(line, Member.class);
 		return user;
+	}
+	
+	public List<Card> getCards (String a_listId, String a_closed) throws IOException
+	{
+		String filter = m_openFilter;
+		
+		if (a_closed.equals(TrelloRepositoryConnector.CLOSED_CARDS)) filter = m_closedFilter;
+		if (a_closed.equals(TrelloRepositoryConnector.CLOSED_AND_NON_CLOSED_CARDS)) filter = m_allFilter;
+		
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/cards?" + filter + "key=" + m_key + "&token=" + m_token);
+		List<Card> cards = null;
+		if(line != null)
+			cards = m_gson.fromJson(line, new TypeToken<List<Card>>(){}.getType());
+		return cards;
 	}
 
 	@Override
@@ -70,8 +89,8 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public List<CardList> getCardLists(String a_boardId, boolean a_seeAlsoClosedLists) throws IOException
 	{
-		String filter = "filter=open&";
-		if (a_seeAlsoClosedLists) filter = "filter=all&";
+		String filter = m_openFilter;
+		if (a_seeAlsoClosedLists) filter = m_allFilter;
 		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?" + filter + "key=" + m_key + "&token=" + m_token);
 		List<CardList> cardLists = null;
 		if(line != null)
