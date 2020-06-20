@@ -41,4 +41,19 @@ public class TrelloUtil
 			a_hours = a_hours + 24;
 		return redactTimePart(a_hours);
 	}
+	
+	public static boolean contains (String a_text, String[] a_array)
+	{
+		boolean contain = false;
+		
+		for (String s : a_array)
+		{
+			if (a_text.equals(s))
+			{
+				contain = true;
+				break;
+			}
+		}
+		return contain;
+	}
 }
