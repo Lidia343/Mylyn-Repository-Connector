@@ -72,6 +72,7 @@ public class CalendarDialog
 		g = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
 		finishButton.setLayoutData(g);
 		finishButton.setText("Finish");
+		m_calendarShell.setDefaultButton(finishButton);
 		
 		setDate();
 		setTime();
