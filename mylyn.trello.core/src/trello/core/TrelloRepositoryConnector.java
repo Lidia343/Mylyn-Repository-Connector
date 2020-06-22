@@ -272,13 +272,18 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 				String trelloDue = card.getDue();
 				if  (trelloDue != null)
 				{
-					TaskAttribute dueAttr = taskData.getRoot().createAttribute(TaskAttribute.DATE_DUE);//taskData.getRoot().createAttribute(TaskAttribute.DATE_DUE).setValue(TrelloUtil.toMylynDate(trelloDue).toString());
+					TaskAttribute dueAttr = taskData.getRoot().createAttribute(TaskAttribute.DATE_DUE);
 					taskData.getAttributeMapper().setDateValue(dueAttr, TrelloUtil.toMylynDate(trelloDue));
 				}
 				
 				a_session.putTaskData(new Task(a_repository.getUrl(), card.getId(), card.getName()), taskData);
 				a_resultCollector.accept(taskData);
 			}
+			
+			/*for (ITask t : a_session.getTasks())
+			{
+				System.out.println(t.getDueDate());
+			}*/
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)

@@ -30,9 +30,9 @@ public class CalendarDialog
 	private String m_trelloTime = "";
 	private String m_trelloDateAndTime = "";
 	
-	private String m_mylynDate = "";
-	private String m_mylynTime = "";
-	private String m_mylynDateAndTime = "";
+	private String m_dateForShow = "";
+	private String m_timeForShow = "";
+	private String m_dateAndTimeForShow = "";
 	
 	public CalendarDialog (Shell a_parent, FinishHandler a_handler)
 	{
@@ -84,7 +84,7 @@ public class CalendarDialog
 				if (timeSelectButton.getSelection() == false)
 				{
 					m_trelloTime = "";
-					m_mylynTime = "";
+					m_timeForShow = "";
 					m_calendarTime.setEnabled(false);
 				}
 				else
@@ -144,7 +144,7 @@ public class CalendarDialog
 			@Override
 			public void widgetSelected (SelectionEvent a_e)
 			{
-				m_handler.finish(m_trelloDateAndTime, m_mylynDateAndTime);
+				m_handler.finish(m_trelloDateAndTime, m_dateAndTimeForShow);
 				m_calendarShell.dispose();
 			}
 
@@ -162,30 +162,27 @@ public class CalendarDialog
 	
 	private void setDate ()
 	{
-		String year = Integer.toString(m_calendarDate.getYear());
+		String day = TrelloUtil.toStandartTimePart(m_calendarDate.getDay());
+		String month = TrelloUtil.toStandartTimePart(m_calendarDate.getMonth() + 1);
+		String year = TrelloUtil.toStandartTimePart(m_calendarDate.getYear());
 		
-		String month = TrelloUtil.redactTimePart (m_calendarDate.getMonth() + 1);
-		
-		String trelloDay = TrelloUtil.redactTimePart (m_calendarDate.getDay() - 1);
-		String mylynDay = TrelloUtil.redactTimePart (m_calendarDate.getDay());
-		
-		m_trelloDate = year + "-" + month + "-" + trelloDay + "T";
-		m_mylynDate = mylynDay + "." + month + "." + year;
+		m_trelloDate = year + "-" + month + "-" + day + "T";
+		m_dateForShow = day + "." + month + "." + year;
 		
 		setDateAndTime();
 	}
 	
 	private void setTime ()
 	{
-		String trelloHours = TrelloUtil.redactHours(m_calendarTime.getHours());
-		String mylynHours = TrelloUtil.redactTimePart(m_calendarTime.getHours());
+		String trelloHours = TrelloUtil.toTrelloHours(m_calendarTime.getHours());
+		String mylynHours = TrelloUtil.toStandartTimePart(m_calendarTime.getHours());
 		
-		String minutes = TrelloUtil.redactTimePart(m_calendarTime.getMinutes());
+		String minutes = TrelloUtil.toStandartTimePart(m_calendarTime.getMinutes());
 		
-		String seconds = TrelloUtil.redactTimePart(m_calendarTime.getSeconds());
+		String seconds = TrelloUtil.toStandartTimePart(m_calendarTime.getSeconds());
 		
 		m_trelloTime = trelloHours + ":" + minutes + ":" + seconds;
-		m_mylynTime = " - " + mylynHours + ":" + minutes + ":" + seconds;
+		m_timeForShow = " - " + mylynHours + ":" + minutes + ":" + seconds;
 		
 		setDateAndTime();
 	}
@@ -193,7 +190,7 @@ public class CalendarDialog
 	private void setDateAndTime ()
 	{
 		m_trelloDateAndTime = m_trelloDate + m_trelloTime;
-		m_mylynDateAndTime = m_mylynDate + m_mylynTime;
+		m_dateAndTimeForShow = m_dateForShow + m_timeForShow;
 	}
 	
 	public boolean isDisposed ()

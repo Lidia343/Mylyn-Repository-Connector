@@ -38,17 +38,25 @@ public class TrelloUtil
 	{
 		a_hours -= 3;
 		if (a_hours < 0)
-			a_hours = a_hours + 24;
+			a_hours += 24;
 		return toStandartTimePart(a_hours);
+	}
+	
+	public static int toMylynHours (int a_hours)
+	{
+		a_hours += 3;
+		if (a_hours > 23)
+			a_hours -= 24;
+		return a_hours;
 	}
 	
 	@SuppressWarnings("deprecation")
 	public static Date toMylynDate (String a_trelloDate)
 	{
-		int year = Integer.parseInt(a_trelloDate.substring(0, 4));
+		int year = Integer.parseInt(a_trelloDate.substring(0, 4)) - 1900;
 		int month = Integer.parseInt(a_trelloDate.substring(5, 7)) - 1;
 		int day = Integer.parseInt(a_trelloDate.substring(8, 10));
-		int hours = Integer.parseInt(a_trelloDate.substring(11, 13)) + 3;
+		int hours = toMylynHours(Integer.parseInt(a_trelloDate.substring(11, 13)));
 		int min = Integer.parseInt(a_trelloDate.substring(14, 16));
 		int sec = Integer.parseInt(a_trelloDate.substring(17, 19));
 		return new Date (year, month, day, hours, min, sec);
