@@ -237,10 +237,14 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 						if (cardDue != null) continue;
 					} 
 					else
+					{
 						if (!queryDue.equals(ALL))
 						{
-							if (cardDue == null || !cardDue.equals(queryDue)) continue;
+							if (cardDue == null) continue;
+							if (queryDue.endsWith("T")) cardDue = cardDue.substring(0, cardDue.indexOf('T') + 1);
+							if (!cardDue.equals(queryDue)) continue;
 						}
+					}
 					
 					String queryComplete = a_query.getAttribute(COMPLETED_QUERY_KEY);
 					boolean cardComplete = Boolean.parseBoolean(c.getDueComplete());
