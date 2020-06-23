@@ -29,8 +29,9 @@ import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
-import trello.core.connection.ITrelloConnection;
-import trello.core.connection.TrelloConnection;
+
+import trello.core.client.ITrelloConnection;
+import trello.core.client.TrelloConnection;
 import trello.core.model.Action;
 import trello.core.model.Card;
 import trello.core.model.Task;

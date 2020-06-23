@@ -1,4 +1,4 @@
-package trello.core.connection;
+package trello.core.client;
 
 import java.io.IOException;
 import java.util.List;

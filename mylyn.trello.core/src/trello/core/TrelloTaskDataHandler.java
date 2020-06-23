@@ -13,8 +13,9 @@ import org.eclipse.mylyn.tasks.core.data.AbstractTaskDataHandler;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
-import trello.core.connection.ITrelloConnection;
-import trello.core.connection.TrelloConnection;
+
+import trello.core.client.ITrelloConnection;
+import trello.core.client.TrelloConnection;
 import trello.core.model.Card;
 
 public class TrelloTaskDataHandler extends AbstractTaskDataHandler

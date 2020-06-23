@@ -1,4 +1,4 @@
-package trello.core.connection;
+package trello.core.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
