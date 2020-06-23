@@ -25,8 +25,8 @@ import org.eclipse.swt.widgets.Shell;
 import mylyn.trello.ui.calendar.CalendarDialog;
 import mylyn.trello.ui.handle.FinishHandler;
 import trello.core.TrelloRepositoryConnector;
-import trello.core.client.ITrelloConnection;
-import trello.core.client.TrelloConnection;
+import trello.core.client.ITrelloClient;
+import trello.core.client.TrelloClient;
 import trello.core.model.Board;
 import trello.core.model.CardList;
 import trello.core.model.Member;
@@ -62,7 +62,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 	private String m_oldValueComboText = "";
 	private String m_oldFieldComboText = "";
 	
-	private TrelloConnection client;
+	private TrelloClient client;
 	
 	private Composite m_baseComposite;
 	private Composite m_cardParametersComposite;
@@ -120,7 +120,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		setTitle(m_pageTitle);
 		setDescription(m_pageDescription);
 		setNeedsClear(true);
-		client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+		client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
 	}
 	
 	/*

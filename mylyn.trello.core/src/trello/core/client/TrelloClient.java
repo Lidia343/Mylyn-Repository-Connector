@@ -31,7 +31,7 @@ import trello.core.model.Member;
  * списках и карточках).
  */
 @SuppressWarnings("restriction")
-public class TrelloConnection implements ITrelloConnection
+public class TrelloClient implements ITrelloClient
 {
 	private String m_key;
 	private String m_token;
@@ -44,7 +44,7 @@ public class TrelloConnection implements ITrelloConnection
 	private final String m_openFilter = "filter=open&";
 	
 
-	public TrelloConnection(String a_key, String a_token)
+	public TrelloClient(String a_key, String a_token)
 	{
 		m_key = a_key;
 		m_token = a_token;
@@ -53,7 +53,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public Member getMemberData() throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=fullName,username,email&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "members/me?fields=fullName,username,email&key=" + m_key + "&token=" + m_token);
 		Member user = null;
 		if(line != null)
 			user = m_gson.fromJson(line, Member.class);
@@ -67,7 +67,7 @@ public class TrelloConnection implements ITrelloConnection
 		if (a_closed.equals(TrelloRepositoryConnector.CLOSED_CARDS)) filter = m_closedFilter;
 		if (a_closed.equals(TrelloRepositoryConnector.CLOSED_AND_NON_CLOSED_CARDS)) filter = m_allFilter;
 		
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/cards?" + filter + "key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/cards?" + filter + "key=" + m_key + "&token=" + m_token);
 		List<Card> cards = null;
 		if(line != null)
 			cards = m_gson.fromJson(line, new TypeToken<List<Card>>(){}.getType());
@@ -80,7 +80,7 @@ public class TrelloConnection implements ITrelloConnection
 		String filter = "open";
 		if (a_seeAlsoClosedBoards) filter = "all";
 		
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=" + filter + "&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=" + filter + "&key=" + m_key + "&token=" + m_token);
 		BoardList boardList = null;
 		if(line != null)
 			boardList = m_gson.fromJson(line, BoardList.class);
@@ -92,7 +92,7 @@ public class TrelloConnection implements ITrelloConnection
 	{
 		String filter = m_openFilter;
 		if (a_seeAlsoClosedLists) filter = m_allFilter;
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?" + filter + "key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "/lists?" + filter + "key=" + m_key + "&token=" + m_token);
 		List<CardList> cardLists = null;
 		if(line != null)
 			cardLists = m_gson.fromJson(line, new TypeToken<List<CardList>>(){}.getType());
@@ -137,7 +137,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public Card getCardById(String a_cardId) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?key=" + m_key + "&token=" + m_token);
 		Card card = null;
 		if(line != null)
 			card = m_gson.fromJson(line, Card.class);
@@ -158,7 +158,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws IOException
 	{
-		connectByUrlAndGetResponse(ITrelloConnection.PUT_METHOD, m_mainUrlPart + "cards/" + a_cardId + 
+		connectByUrlAndGetResponse(ITrelloClient.PUT_METHOD, m_mainUrlPart + "cards/" + a_cardId + 
 	    "?" + a_attributeName + "=" + URLEncoder.encode(a_attributeValue, encoding) + "&key=" + m_key + "&token=" + m_token);
 		Card card = getCardById(a_cardId);
 		return card.getUrl();
@@ -167,7 +167,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public void deleteCard(String a_cardId) throws IOException
 	{
-		connectByUrlAndGetResponse(ITrelloConnection.DELETE_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?key=" + m_key + "&token=" + m_token);
+		connectByUrlAndGetResponse(ITrelloClient.DELETE_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?key=" + m_key + "&token=" + m_token);
 	}
 
 	@Override
@@ -264,7 +264,7 @@ public class TrelloConnection implements ITrelloConnection
 		Board board = null;
 		try
 		{
-			line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "?key=" + m_key + "&token=" + m_token);
+			line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "boards/" + a_boardId + "?key=" + m_key + "&token=" + m_token);
 			if(line != null)
 				board = m_gson.fromJson(line, Board.class);
 		}
@@ -285,14 +285,14 @@ public class TrelloConnection implements ITrelloConnection
 		
 		for (int i = 0; i <  a_boardIds.size(); i++)
 		{
-			line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "boards/" + a_boardIds.get(i) + "/members?key=" + m_key + "&token=" + m_token);
+			line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "boards/" + a_boardIds.get(i) + "/members?key=" + m_key + "&token=" + m_token);
 			if(line != null)
 				partialMembers = m_gson.fromJson(line, new TypeToken<List<Member>>(){}.getType());
 			
 			boolean contain = false;
 			for (Member m : partialMembers)
 			{
-				line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/" + m.getId() + "?key=" + m_key + "&token=" + m_token);
+				line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "members/" + m.getId() + "?key=" + m_key + "&token=" + m_token);
 				if (line != null)
 					temp = m_gson.fromJson(line, Member.class);
 				
@@ -314,7 +314,7 @@ public class TrelloConnection implements ITrelloConnection
 		List<Action> actions = null;
 		try
 		{
-			line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/actions?key=" + m_key + "&token=" + m_token);
+			line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/actions?key=" + m_key + "&token=" + m_token);
 			if (line != null)
 				actions = m_gson.fromJson(line, new TypeToken<List<Action>>(){}.getType());
 		}

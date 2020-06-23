@@ -18,7 +18,7 @@ import trello.core.model.Member;
  * получения от него пользовательских данных (информации о пользователе, его
  * досках, списках и карточках).
  */
-public interface ITrelloConnection
+public interface ITrelloClient
 {
 	public static final String DEFAULT_KEY = "1c8962f69eea55f6346aacabf4b9d90e";
 	public static final String DEFAULT_TOKEN = "f51cede3da475d589f56dc510ce4292bd4bcae622d1cca92e75821309cef697f";

@@ -30,8 +30,8 @@ import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
-import trello.core.client.ITrelloConnection;
-import trello.core.client.TrelloConnection;
+import trello.core.client.ITrelloClient;
+import trello.core.client.TrelloClient;
 import trello.core.model.Action;
 import trello.core.model.Card;
 import trello.core.model.Task;
@@ -125,7 +125,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 
 	private String getTaskIdOrUrl (boolean a_isId, String a_idOrUrl)
 	{
-		ITrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+		ITrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
 		try
 		{
 			if (a_isId)
@@ -183,7 +183,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 				a_task.setCompletionDate(null);
 			}
 		}
-		TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+		TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
 		try
 		{
 			a_task.setUrl(client.changeCard(a_task.getTaskId(), Card.NAME, client.getCardById(a_task.getTaskId()).getName()));
@@ -213,7 +213,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	{
 		try
 		{
-			TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+			TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
 			int listIdNumbers = Integer.parseInt(a_query.getAttribute(LIST_ID_NUMBERS_QUERY_KEY));
 			List<String> listIds = new ArrayList<>();
 			for (int i = 0; i < listIdNumbers; i++)
@@ -364,7 +364,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			
 			try 
 			{
-				TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+				TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
 				Set<String> ids = client.getChangedCards(a_session.getTasks());
 			
 				//System.out.println("Size:  " + ids.size());
@@ -459,7 +459,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public IStatus deleteTask(TaskRepository a_repository, ITask a_task, IProgressMonitor a_monitor) throws CoreException 
 	{
-		TrelloConnection client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
+		TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
 		try 
 		{
 			client.deleteCard(a_task.getTaskId());
