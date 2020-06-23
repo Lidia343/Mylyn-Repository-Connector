@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.eclipse.mylyn.tasks.core.ITask;
 
+import trello.core.model.Action;
 import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
@@ -108,4 +109,6 @@ public interface ITrelloConnection
 	Board getBoard (String a_boardId);
 	
 	List<Member> getMembers(List<String> boardIds) throws Exception;
+	
+	List<Action> getActions(String a_listId) throws Exception;
 }

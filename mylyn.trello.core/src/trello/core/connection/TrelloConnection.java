@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import trello.core.TrelloRepositoryConnector;
+import trello.core.model.Action;
 import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
@@ -79,7 +80,7 @@ public class TrelloConnection implements ITrelloConnection
 		String filter = "open";
 		if (a_seeAlsoClosedBoards) filter = "all";
 		
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=" + filter + "&board_fields=name,url,closed&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "members/me?fields=none&boards=" + filter + "&key=" + m_key + "&token=" + m_token);
 		BoardList boardList = null;
 		if(line != null)
 			boardList = m_gson.fromJson(line, BoardList.class);
@@ -136,7 +137,7 @@ public class TrelloConnection implements ITrelloConnection
 	@Override
 	public Card getCardById(String a_cardId) throws IOException
 	{
-		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?fields=name,desc,url,closed,due,dueComplete,dateLastActivity,idChecklists,idMembers&key=" + m_key + "&token=" + m_token);
+		String line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "?key=" + m_key + "&token=" + m_token);
 		Card card = null;
 		if(line != null)
 			card = m_gson.fromJson(line, Card.class);
@@ -204,7 +205,7 @@ public class TrelloConnection implements ITrelloConnection
 		{
 			for (CardList l : getCardLists(b.getId(), true))
 			{
-				for (Card c : l.getCards())
+				for (Card c : getCards(l.getId(), TrelloRepositoryConnector.CLOSED_AND_NON_CLOSED_CARDS))
 				{
 					cards.add(c);
 				}
@@ -304,5 +305,23 @@ public class TrelloConnection implements ITrelloConnection
 			}
 		}
 		return members;
+	}
+	
+	@Override
+	public List<Action> getActions (String a_listId) throws IOException
+	{
+		String line;
+		List<Action> actions = null;
+		try
+		{
+			line = connectByUrlAndGetResponse(ITrelloConnection.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/actions?key=" + m_key + "&token=" + m_token);
+			if (line != null)
+				actions = m_gson.fromJson(line, new TypeToken<List<Action>>(){}.getType());
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		return actions;
 	}
 }

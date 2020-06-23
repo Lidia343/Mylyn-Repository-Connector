@@ -31,6 +31,7 @@ import org.eclipse.mylyn.tasks.core.data.TaskMapper;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 import trello.core.connection.ITrelloConnection;
 import trello.core.connection.TrelloConnection;
+import trello.core.model.Action;
 import trello.core.model.Card;
 import trello.core.model.Task;
 import trello.core.util.TrelloUtil;
@@ -222,6 +223,30 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			List<Card> cards = new ArrayList<>();
 			for (String id : listIds)
 			{
+				/////////////////////////////////////////////////////////// Тест получения действий:
+				/*List<Action> actions = client.getActions(id);
+				int i = 0;
+				for (Action a : actions)
+				{
+					System.out.println(actions.get(i).getDate());
+					String type = a.getType();
+					if (type.equals(Action.UPDATE_CARD))
+					{
+						if (actions.get(i).getData().getOld() != null && actions.get(i).getData().getOld().getDueComplete() != null)
+						System.out.println(actions.get(i).getData().getOld().getDueComplete());
+						System.out.println(actions.get(i).getData().getCard().getName());
+					}
+						if (type.equals(Action.CREATE_CARD))
+						{
+							System.out.println(actions.get(i).getData().getCard().getName());
+						}
+					if (i == 3) break;
+					i++;
+					System.out.println();
+					System.out.println();
+					System.out.println();
+				}*/
+				/////////////////////////////////////////////////////////////
 				List<Card> temp = client.getCards(id, a_query.getAttribute(CLOSED_QUERY_KEY));
 				for (Card c : temp)
 				{
