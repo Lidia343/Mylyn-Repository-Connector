@@ -123,6 +123,16 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		client = new TrelloConnection(ITrelloConnection.DEFAULT_KEY, ITrelloConnection.DEFAULT_TOKEN);
 	}
 	
+	/*
+	@Override
+	public boolean isPageComplete() {
+		if (getTitle() != null && getTitle().length() > 0) {
+			return true;
+		}
+		setMessage("Enter_a_title");
+		return false;
+	}*/
+	
 	@Override
 	protected void doRefreshControls ()
 	{
@@ -806,8 +816,14 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 			addCardlistIdAndCardlistNameToLists(a_l.getId(), TrelloRepositoryConnector.LIST_ID_QUERY_KEY + Integer.toString(m_allSelLists.indexOf(a_l)));
 			
 			String listFieldText = m_listFieldsCombo.getText();
-			if (listFieldText.equals(m_id)) m_selectedListsCombo.add(a_l.getId());
-			if (listFieldText.equals(m_name)) m_selectedListsCombo.add(a_l.getName());
+			if (listFieldText.equals(m_id)) 
+			{
+				addFieldsAndSetText (m_selectedListsCombo, new String[] {a_l.getId()}, a_l.getId());
+			}
+			if (listFieldText.equals(m_name)) 
+			{
+				addFieldsAndSetText (m_selectedListsCombo, new String[] {a_l.getName()}, a_l.getName());
+			}
 		}
 	}
 	
@@ -920,10 +936,10 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		FinishHandler m_handler = new FinishHandler () 
 		{
 			@Override
-			public void finish(String a_trelloDateAndTime, String a_mylynDateAndTime)
+			public void finish(String a_trelloDateAndTime, String a_dateAndTimeForShow)
 			{
 				m_dueDateAndTime = a_trelloDateAndTime;
-				m_dueDateCombo.setText(a_mylynDateAndTime);
+				m_dueDateCombo.setText(a_dateAndTimeForShow);
 			}
 		};
 		
