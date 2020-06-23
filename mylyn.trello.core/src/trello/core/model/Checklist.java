@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Класс необходим для хранения информации о чек-листе карточки.
  */
-public class CheckList extends TrelloObject
+public class Checklist extends TrelloObject
 {
 	private List<CheckItem> checkItems;
 	

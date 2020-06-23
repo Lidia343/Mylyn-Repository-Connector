@@ -23,6 +23,7 @@ import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
+import trello.core.model.Checklist;
 import trello.core.model.Member;
 
 /**
@@ -312,16 +313,20 @@ public class TrelloClient implements ITrelloClient
 	{
 		String line;
 		List<Action> actions = null;
-		try
-		{
-			line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/actions?key=" + m_key + "&token=" + m_token);
-			if (line != null)
+		line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "lists/" + a_listId + "/actions?key=" + m_key + "&token=" + m_token);
+		if (line != null)
 				actions = m_gson.fromJson(line, new TypeToken<List<Action>>(){}.getType());
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-		}
 		return actions;
+	}
+	
+	@Override
+	public List<Checklist> getChecklists (String a_cardId) throws IOException
+	{
+		String line;
+		List<Checklist> checklists = null;
+		line = connectByUrlAndGetResponse(ITrelloClient.GET_METHOD, m_mainUrlPart + "cards/" + a_cardId + "/checklists?key=" + m_key + "&token=" + m_token);
+		if (line != null)
+			checklists = m_gson.fromJson(line, new TypeToken<List<Checklist>>(){}.getType());
+		return checklists;
 	}
 }

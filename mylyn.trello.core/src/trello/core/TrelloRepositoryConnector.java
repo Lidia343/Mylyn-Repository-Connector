@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.mylyn.internal.tasks.core.AbstractTask;
 import org.eclipse.mylyn.tasks.core.AbstractRepositoryConnector;
 import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -34,6 +35,7 @@ import trello.core.client.ITrelloClient;
 import trello.core.client.TrelloClient;
 import trello.core.model.Action;
 import trello.core.model.Card;
+import trello.core.model.Checklist;
 import trello.core.model.Task;
 import trello.core.util.TrelloUtil;
 
@@ -183,16 +185,10 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 				a_task.setCompletionDate(null);
 			}
 		}
-		TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
-		try
-		{
-			a_task.setUrl(client.changeCard(a_task.getTaskId(), Card.NAME, client.getCardById(a_task.getTaskId()).getName()));
-		}
-		catch(IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		a_task.setUrl(a_taskData.getRoot().getAttribute(TaskAttribute.TASK_URL).getValue());
+		
+		
 		/*if (!a_taskData.isPartial()) 
 		{
 			a_task.setAttribute("SupportsSubtasks", Boolean.toString(taskDataHandler.supportsSubtasks(a_taskData)));
@@ -339,6 +335,25 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 				
 				a_session.putTaskData(new Task(a_repository.getUrl(), c.getId(), c.getName()), taskData);
 				a_resultCollector.accept(taskData);
+				
+				//-----------------------------------------------------------------------------------------------------------
+				String idChecklists[] = c.getIdChecklists();
+				if (idChecklists != null)
+				{
+					List<Checklist> checklists = client.getChecklists(c.getId());
+					if (checklists == null) continue;
+					for (Checklist list : checklists)
+					{
+						TaskData listData = new TaskData(m_taskDataHandler.getAttributeMapper(a_repository), CONNECTOR_KIND, a_repository.getRepositoryUrl(), list.getId());
+						TaskAttribute listDataRoot = listData.getRoot();
+						listDataRoot.createAttribute(TaskAttribute.SUMMARY).setValue(list.getName());
+						listDataRoot.createAttribute(TaskAttribute.TASK_URL).setValue(c.getUrl());
+						//if (m_taskDataHandler.initializeSubTaskData(a_repository, listData, taskData, a_monitor)) System.out.println("yes");
+						a_session.putTaskData(new Task(a_repository.getUrl(), list.getId(), list.getName()), listData);
+						a_resultCollector.accept(listData);
+					}
+				}
+				//-----------------------------------------------------------------------------------------------------------
 			}
 			return Status.OK_STATUS;
 		}

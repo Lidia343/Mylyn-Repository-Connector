@@ -11,6 +11,7 @@ import trello.core.model.Board;
 import trello.core.model.BoardList;
 import trello.core.model.Card;
 import trello.core.model.CardList;
+import trello.core.model.Checklist;
 import trello.core.model.Member;
 
 /**
@@ -111,4 +112,6 @@ public interface ITrelloClient
 	List<Member> getMembers(List<String> boardIds) throws Exception;
 	
 	List<Action> getActions(String a_listId) throws Exception;
+	
+	List<Checklist> getChecklists (String a_cardId) throws Exception;
 }

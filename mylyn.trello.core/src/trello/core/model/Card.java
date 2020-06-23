@@ -20,7 +20,7 @@ public class Card extends TrelloObject
 	private String url;
 	private String due;
 	private String dueComplete;
-	private String dateLastActivity;////////////////////////
+	private String dateLastActivity;
 	private String[] idChecklists;
 
 	/**
