@@ -222,34 +222,12 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			}
 			
 			List<Card> cards = new ArrayList<>();
+			List<Action> actions = new ArrayList<>();
 			for (String id : listIds)
 			{
-				/////////////////////////////////////////////////////////// Тест получения действий:
-				/*List<Action> actions = client.getActions(id);
-				int i = 0;
-				for (Action a : actions)
-				{
-					System.out.println(actions.get(i).getDate());
-					String type = a.getType();
-					if (type.equals(Action.UPDATE_CARD))
-					{
-						if (actions.get(i).getData().getOld() != null && actions.get(i).getData().getOld().getDueComplete() != null)
-						System.out.println(actions.get(i).getData().getOld().getDueComplete());
-						System.out.println(actions.get(i).getData().getCard().getName());
-					}
-						if (type.equals(Action.CREATE_CARD))
-						{
-							System.out.println(actions.get(i).getData().getCard().getName());
-						}
-					if (i == 3) break;
-					i++;
-					System.out.println();
-					System.out.println();
-					System.out.println();
-				}*/
-				/////////////////////////////////////////////////////////////
-				List<Card> temp = client.getCards(id, a_query.getAttribute(CLOSED_QUERY_KEY));
-				for (Card c : temp)
+				List<Card> tempCards = client.getCards(id, a_query.getAttribute(CLOSED_QUERY_KEY));
+				boolean getActions = false;
+				for (Card c : tempCards)
 				{
 					String queryDue = a_query.getAttribute(DUE_QUERY_KEY);
 					String cardDue = c.getDue();
@@ -288,32 +266,80 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 					{
 						c.setIdChecklists(null);
 					}
-
+					
 					cards.add(c); 
+					getActions = true;
 				}
+				//-----------------------------------------------------------------------------------------------------------
+				if (!getActions) continue;
+				List<Action> tempActions = client.getActions(id);
+				for (Action a : tempActions)
+				{
+					String type = a.getType();
+					if (type.equals(Action.UPDATE_CARD) || type.equals(Action.CREATE_CARD))
+						actions.add(a);
+				}
+				//-----------------------------------------------------------------------------------------------------------
 			}
 			
-			for (Card card : cards)
+			//-----------------------------------------------------------------------------------------------------------
+			List<Action> actionsForRemoving = new ArrayList<>();
+			for (Action a : actions)
 			{
-				TaskData taskData = new TaskData(m_taskDataHandler.getAttributeMapper(a_repository), CONNECTOR_KIND, a_repository.getRepositoryUrl(), card.getId());
-				taskData.getRoot().createAttribute(TaskAttribute.SUMMARY).setValue(card.getName());
-				taskData.getRoot().createAttribute(TaskAttribute.TASK_URL).setValue(card.getUrl());
-				
-				String trelloDue = card.getDue();
-				if  (trelloDue != null)
+				boolean removeAction = true;
+				for (Card c : cards)
 				{
-					TaskAttribute dueAttr = taskData.getRoot().createAttribute(TaskAttribute.DATE_DUE);
-					taskData.getAttributeMapper().setDateValue(dueAttr, TrelloUtil.toMylynDate(trelloDue));
+					if (a.getData().getCard().getId().equals(c.getId()))
+						removeAction = false;
 				}
+				if (removeAction) actionsForRemoving.add(a);
+			}
+			for (Action a : actionsForRemoving)
+			{
+				actions.remove(a);
+			}
+			//-----------------------------------------------------------------------------------------------------------
+			
+			for (Card c : cards)
+			{
+				TaskData taskData = new TaskData(m_taskDataHandler.getAttributeMapper(a_repository), CONNECTOR_KIND, a_repository.getRepositoryUrl(), c.getId());
+				TaskAttribute root = taskData.getRoot();
+				root.createAttribute(TaskAttribute.SUMMARY).setValue(c.getName());
+				root.createAttribute(TaskAttribute.TASK_URL).setValue(c.getUrl());
 				
-				a_session.putTaskData(new Task(a_repository.getUrl(), card.getId(), card.getName()), taskData);
+				String trelloDue = c.getDue();
+				if  (trelloDue != null) createDateAttribute(taskData, TaskAttribute.DATE_DUE, trelloDue);
+				
+				//-----------------------------------------------------------------------------------------------------------
+				String lastActivity = c.getDateLastActivity();
+				if (lastActivity != null)
+					createDateAttribute(taskData, TaskAttribute.DATE_MODIFICATION, lastActivity);
+				
+				for (Action a : actions)
+				{
+					Card actionCard = a.getData().getCard();
+					if (actionCard.getId().equals(c.getId()))
+					{
+						if (a.getType().equals(Action.CREATE_CARD))
+							createDateAttribute(taskData, TaskAttribute.DATE_CREATION, a.getDate());
+						else
+						{
+							if (a.getData().getOld().getDueComplete() != null)
+							{
+								if (actionCard.getDueComplete().equals("true"))
+								{
+									createDateAttribute(taskData, TaskAttribute.DATE_COMPLETION, a.getDate());
+									break;
+								}
+							}
+						}
+					}
+				}
+				//-----------------------------------------------------------------------------------------------------------
+				
+				a_session.putTaskData(new Task(a_repository.getUrl(), c.getId(), c.getName()), taskData);
 				a_resultCollector.accept(taskData);
 			}
-			
-			/*for (ITask t : a_session.getTasks())
-			{
-				System.out.println(t.getDueDate());
-			}*/
 			return Status.OK_STATUS;
 		}
 		catch (Exception e)
@@ -321,6 +347,12 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			e.printStackTrace();
 			return Status.CANCEL_STATUS;
 		}
+	}
+	
+	private void createDateAttribute (TaskData a_taskData, String a_attrType, String a_date)//Перенести со всеми атрибутами в обработчик
+	{
+		TaskAttribute attr = a_taskData.getRoot().createAttribute(a_attrType);
+		a_taskData.getAttributeMapper().setDateValue(attr, TrelloUtil.toMylynDate(a_date));
 	}
 	
 	@Override
