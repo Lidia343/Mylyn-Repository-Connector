@@ -1,7 +1,5 @@
 package trello.core.model;
 
-import java.util.Date;
-
 /**
  * Класс необходим для хранения информации о карточке.
  */
@@ -20,12 +18,10 @@ public class Card extends TrelloObject
 	
 	private String desc;
 	private String url;
-	private String closed;
 	private String due;
 	private String dueComplete;
-	private String dateLastActivity;
+	private String dateLastActivity;////////////////////////
 	private String[] idChecklists;
-	private String[] idMembers;
 
 	/**
 	 * Конструктор класса Card.
@@ -51,14 +47,6 @@ public class Card extends TrelloObject
 		url = a_url;
 	}
 
-	/** 
-	 * @param a_closed - состояние закрыта/открыта карточки
-	 */
-	public void setClosed(String a_closed)
-	{
-		closed = a_closed;
-	}
-	
 	/**
 	 * @param a_due - запланированная дата выполнения карточки
 	 */
@@ -91,14 +79,6 @@ public class Card extends TrelloObject
 		idChecklists = a_idChecklists;
 	}
 	
-	/** 
-	 * @param a_idMembers - массив id участников карточки
-	 */
-	public void setIdMembers(String[] a_idMembers)
-	{
-		idMembers = a_idMembers;
-	}
-
 	/**
 	 * @return описание карточки
 	 */
@@ -113,14 +93,6 @@ public class Card extends TrelloObject
 	public String getUrl()
 	{
 		return url;
-	}
-	
-	/**
-	 * @return состояние закрыта/открыта карточки
-	 */
-	public String getClosed()
-	{
-		return closed;
 	}
 
 	/**
@@ -154,12 +126,18 @@ public class Card extends TrelloObject
 	{
 		return idChecklists;
 	}
-
-	/**
-	 * @return массив id участников карточки
-	 */
-	public String[] getIdMembers()
+	
+	@Override
+	public String toString ()
 	{
-		return idMembers;
+		String ids = "";
+		if (idChecklists != null)
+		for (String s : idChecklists)
+		{
+			ids += (s + "\n");
+		}
+		return "Id: " + id + "\nName: " + name + "\nDesc: " + desc + "\nUrl: " + url + "\nClosed: " +"\nDue: "
+				+ due + "\nDueComplete: " + dueComplete + "\nDateLastActivity: " + dateLastActivity
+				+ "\nIdChecklists:\n" + ids;
 	}
 }
