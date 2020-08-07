@@ -6,155 +6,165 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
-public class NewTaskWizardPage implements IWizardPage
-{
+import mylyn.trello.ui.edit.TrelloStringFieldEditor;
 
+public class TrelloTaskWizardPage implements IWizardPage
+{	
+	private String m_title = "New Task";
+	private String m_name = "Task";
+	private String m_description = "Enter task parameters";
+	private String m_errorMessage = "";
+	
+	private IWizard m_wizard;
+	
+	private Composite m_parent;
+	
+	private TrelloStringFieldEditor m_nameEditor;
+	private TrelloStringFieldEditor m_descEditor;
+	private TrelloStringFieldEditor m_dueEditor;
+	private TrelloStringFieldEditor m_dueCompleteEditor;
+	
+	//Чек-листы
+	//Размер
+	
 	@Override
 	public void createControl(Composite a_parent)
 	{
-		// TODO Auto-generated method stub
-
+		m_parent = a_parent;
+		
+		m_parent.getShell().setText(m_title);
+		
+		m_nameEditor = new TrelloStringFieldEditor(m_parent, "Name:");
+		m_descEditor = new TrelloStringFieldEditor(m_parent, "Description:");
+		m_dueEditor = new TrelloStringFieldEditor(m_parent, "Due:");
+		m_dueCompleteEditor = new TrelloStringFieldEditor(m_parent, "Due complete:");
+		
+		Shell shell = m_parent.getShell();
+		shell.pack();
+		shell.setMinimumSize(shell.getSize());
 	}
 
+	
+	
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public Control getControl()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return m_parent;
 	}
 
 	@Override
 	public String getDescription()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return m_description;
 	}
 
 	@Override
 	public String getErrorMessage()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return m_errorMessage;
 	}
 
 	@Override
 	public Image getImage()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getMessage()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return m_errorMessage;
 	}
 
 	@Override
 	public String getTitle()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return m_title;
 	}
 
 	@Override
 	public void performHelp()
 	{
-		// TODO Auto-generated method stub
-
+		System.out.println("help");
 	}
 
 	@Override
 	public void setDescription(String a_description)
 	{
-		// TODO Auto-generated method stub
-
+		m_description = a_description;
 	}
 
 	@Override
 	public void setImageDescriptor(ImageDescriptor a_image)
 	{
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void setTitle(String a_title)
 	{
-		// TODO Auto-generated method stub
-
+		m_title = a_title;
 	}
 
 	@Override
 	public void setVisible(boolean a_visible)
 	{
-		// TODO Auto-generated method stub
-
+		m_parent.setVisible(a_visible);
 	}
 
 	@Override
 	public boolean canFlipToNextPage()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public String getName()
 	{
-		// TODO Auto-generated method stub
-		return "";
+		return m_name;
 	}
 
 	@Override
 	public IWizardPage getNextPage()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IWizardPage getPreviousPage()
 	{
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IWizard getWizard()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return m_wizard;
 	}
 
 	@Override
 	public boolean isPageComplete()
 	{
-		// TODO Auto-generated method stub
-		return true;
+		return false;
 	}
 
 	@Override
 	public void setPreviousPage(IWizardPage a_page)
 	{
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void setWizard(IWizard a_newWizard)
 	{
-		// TODO Auto-generated method stub
-
+		m_wizard = a_newWizard;
 	}
-
 }

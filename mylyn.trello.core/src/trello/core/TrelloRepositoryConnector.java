@@ -3,6 +3,7 @@ package trello.core;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +24,16 @@ import org.eclipse.mylyn.tasks.core.IRepositoryQuery;
 import org.eclipse.mylyn.tasks.core.ITask;
 //import org.eclipse.mylyn.tasks.core.ITaskComment;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
+import org.eclipse.mylyn.tasks.core.data.TaskAttachmentMapper;
 import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskAttributeMapper;
 //import org.eclipse.mylyn.tasks.core.data.TaskAttribute;
 import org.eclipse.mylyn.tasks.core.data.TaskData;
 import org.eclipse.mylyn.tasks.core.data.TaskDataCollector;
 import org.eclipse.mylyn.tasks.core.data.TaskMapper;
+import org.eclipse.mylyn.tasks.core.data.TaskRelation;
+import org.eclipse.mylyn.tasks.core.data.TaskRelation.Direction;
+import org.eclipse.mylyn.tasks.core.data.TaskRelation.Kind;
 import org.eclipse.mylyn.tasks.core.sync.ISynchronizationSession;
 
 import trello.core.client.ITrelloClient;
@@ -127,7 +132,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 
 	private String getTaskIdOrUrl (boolean a_isId, String a_idOrUrl)
 	{
-		ITrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
+		ITrelloClient client = new TrelloClient();
 		try
 		{
 			if (a_isId)
@@ -140,6 +145,13 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	@Nullable
+	public Collection<TaskRelation> getTaskRelations(@NonNull TaskData taskData)
+	{
+		return new ArrayList<TaskRelation>();
 	}
 	
 	@Override
@@ -166,12 +178,13 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public void updateTaskFromTaskData(@NonNull TaskRepository a_taskRepository, @NonNull ITask a_task, @NonNull TaskData a_taskData)
 	{
+		//System.out.println("update");
 		TaskMapper mapper = (TaskMapper)getTaskMapping(a_taskData);
 		mapper.applyTo(a_task);
 		String status = mapper.getStatus();
 		if (status != null) 
 		{
-			if (mapper.getStatus().equals("closed")) 
+			if (mapper.getStatus().equals("closed")) //////////////////////
 			{
 				Date modificationDate = mapper.getModificationDate();
 				if (modificationDate == null) 
@@ -186,15 +199,21 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			}
 		}
 		
-		a_task.setUrl(a_taskData.getRoot().getAttribute(TaskAttribute.TASK_URL).getValue());
-		
-		
-		/*if (!a_taskData.isPartial()) 
+		//a_task.setUrl(a_taskData.getRoot().getAttribute(TaskAttribute.TASK_URL).getValue());
+		//--------------------------------------------------------------------------------------
+		if (hasTaskChanged(a_taskRepository,  a_task,  a_taskData))
 		{
-			a_task.setAttribute("SupportsSubtasks", Boolean.toString(taskDataHandler.supportsSubtasks(a_taskData)));
-			Date date = a_task.getModificationDate();
-			a_task.setAttribute("UpdateDate", (date != null) ? TracUtil.toTracTime(date) + "" : null); //$NON-NLS-1$
-		}*/
+			TrelloClient client = new TrelloClient();
+			//client.changeCard(a_taskData.getTaskId(), Card.NAME,  TrelloUtil.toTrelloTime(a_taskData.getAttributeMapper().getDateValue(getAttribute(TaskAttribute.DATE_DUE)));
+		}
+		//-----------------------------------------------------------------------------------------
+		
+		if (!a_taskData.isPartial()) 
+		{
+			//a_task.setAttribute("SupportsSubtasks", "true");
+			//Date date = a_task.getModificationDate();
+			//a_task.setAttribute(TaskAttribute.DATE_MODIFICATION, (date != null) ? TracUtil.toTracTime(date) + "" : null); //$NON-NLS-1$
+		}
 	}
 
 	@Override
@@ -209,7 +228,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	{
 		try
 		{
-			TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
+			TrelloClient client = new TrelloClient();
 			int listIdNumbers = Integer.parseInt(a_query.getAttribute(LIST_ID_NUMBERS_QUERY_KEY));
 			List<String> listIds = new ArrayList<>();
 			for (int i = 0; i < listIdNumbers; i++)
@@ -302,6 +321,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 				TaskAttribute root = taskData.getRoot();
 				root.createAttribute(TaskAttribute.SUMMARY).setValue(c.getName());
 				root.createAttribute(TaskAttribute.TASK_URL).setValue(c.getUrl());
+				//root.createAttribute(TaskAttribute.ATTACHMENT_DESCRIPTION).setValue("desc");
 				
 				String trelloDue = c.getDue();
 				if  (trelloDue != null) createDateAttribute(taskData, TaskAttribute.DATE_DUE, trelloDue);
@@ -344,11 +364,19 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 					if (checklists == null) continue;
 					for (Checklist list : checklists)
 					{
+						TaskAttribute attAttr = taskData.getRoot();
+						attAttr.createMappedAttribute(TaskAttribute.ATTACHMENT_CONTENT_TYPE);
+						TaskAttachmentMapper mapper = TaskAttachmentMapper.createFrom(attAttr.getAttribute(TaskAttribute.ATTACHMENT_CONTENT_TYPE));
+						//mapper.
+						//TaskRelation relation = TaskRelation.subtask(c.getId());
+						
 						TaskData listData = new TaskData(m_taskDataHandler.getAttributeMapper(a_repository), CONNECTOR_KIND, a_repository.getRepositoryUrl(), list.getId());
 						TaskAttribute listDataRoot = listData.getRoot();
 						listDataRoot.createAttribute(TaskAttribute.SUMMARY).setValue(list.getName());
 						listDataRoot.createAttribute(TaskAttribute.TASK_URL).setValue(c.getUrl());
 						//if (m_taskDataHandler.initializeSubTaskData(a_repository, listData, taskData, a_monitor)) System.out.println("yes");
+						//taskData.getAttributeMapper().createTaskAttachment(listData);////
+						
 						a_session.putTaskData(new Task(a_repository.getUrl(), list.getId(), list.getName()), listData);
 						a_resultCollector.accept(listData);
 					}
@@ -411,7 +439,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			
 			try 
 			{
-				TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
+				TrelloClient client = new TrelloClient();
 				Set<String> ids = client.getChangedCards(a_session.getTasks());
 			
 				//System.out.println("Size:  " + ids.size());
@@ -506,7 +534,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Override
 	public IStatus deleteTask(TaskRepository a_repository, ITask a_task, IProgressMonitor a_monitor) throws CoreException 
 	{
-		TrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
+		TrelloClient client = new TrelloClient();
 		try 
 		{
 			client.deleteCard(a_task.getTaskId());

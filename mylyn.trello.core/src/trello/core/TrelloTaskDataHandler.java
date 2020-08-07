@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.mylyn.commons.net.Policy;
+import org.eclipse.mylyn.tasks.core.ITaskAttachment;
 import org.eclipse.mylyn.tasks.core.ITaskMapping;
 import org.eclipse.mylyn.tasks.core.RepositoryResponse;
 import org.eclipse.mylyn.tasks.core.TaskRepository;
@@ -38,7 +39,7 @@ public class TrelloTaskDataHandler extends AbstractTaskDataHandler
 	
 	private TaskData downloadTaskData(TaskRepository a_repository, String a_taskId, IProgressMonitor a_monitor) throws CoreException
 	{
-		ITrelloClient client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
+		ITrelloClient client = new TrelloClient();
 		Card card = null;
 		try
 		{

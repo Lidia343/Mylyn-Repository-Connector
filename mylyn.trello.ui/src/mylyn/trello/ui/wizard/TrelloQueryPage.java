@@ -120,7 +120,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		setTitle(m_pageTitle);
 		setDescription(m_pageDescription);
 		setNeedsClear(true);
-		client = new TrelloClient(ITrelloClient.DEFAULT_KEY, ITrelloClient.DEFAULT_TOKEN);
+		client = new TrelloClient();
 	}
 	
 	/*
