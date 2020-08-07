@@ -2,6 +2,7 @@ package trello.core.client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -85,6 +86,7 @@ public interface ITrelloClient
 	 */
 	String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws Exception;
 	
+	Card createCard () throws Exception;
 	
 	/**
 	 * Метод удаляет карточку из репозитория.

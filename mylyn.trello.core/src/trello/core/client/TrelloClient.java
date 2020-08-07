@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -45,10 +46,10 @@ public class TrelloClient implements ITrelloClient
 	private final String m_openFilter = "filter=open&";
 	
 
-	public TrelloClient(String a_key, String a_token)
+	public TrelloClient()
 	{
-		m_key = a_key;
-		m_token = a_token;
+		m_key = ITrelloClient.DEFAULT_KEY;
+		m_token = ITrelloClient.DEFAULT_TOKEN;
 	}
 	
 	@Override
@@ -154,6 +155,19 @@ public class TrelloClient implements ITrelloClient
 				return c;
 		}
 		return null;
+	}
+	
+	@Override
+	public Card createCard () throws IOException
+	{
+		String line = connectByUrlAndGetResponse(ITrelloClient.POST_METHOD, m_mainUrlPart + "cards?" + 
+			    "idList=5eee983b50e5a487413562b4" + "&key=" + m_key + "&token=" + m_token);
+		Card card = null;
+		if (line != null)
+		{
+			card = m_gson.fromJson(line, Card.class);
+		}
+		return card;
 	}
 	
 	@Override
