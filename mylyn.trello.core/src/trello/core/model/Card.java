@@ -1,22 +1,15 @@
 package trello.core.model;
 
+import trello.core.TrelloAttribute;
+
 /**
  * Класс необходим для хранения информации о карточке.
  */
 public class Card extends TrelloObject
 {
-	public static final String ID = "id";
-	public static final String NAME = "name";
-	public static final String DESC = "desc";
-	public static final String URL = "url";
-	public static final String CLOSED = "closed";
-	public static final String DUE = "due";
-	public static final String DUE_COMPLETE = "dueComplete";
-	public static final String DATE_LAST_ACTIVITY = "dateLastActivity";
-	public static final String ID_CHECKLISTS = "idChecklists";
-	public static final String ID_MEMBERS = "idMembers";
-	
+	private String closed;
 	private String desc;
+	private String idList;
 	private String url;
 	private String due;
 	private String dueComplete;
@@ -31,6 +24,16 @@ public class Card extends TrelloObject
 		name = "";
 	}
 
+	public void setClosed (String a_closed)
+	{
+		closed = a_closed;
+	}
+	
+	public String getClosed ()
+	{
+		return closed;
+	}
+	
 	/** 
 	 * @param a_name - описание карточки
 	 */
@@ -39,6 +42,16 @@ public class Card extends TrelloObject
 		desc = a_desc;
 	}
 
+	public void setIdList (String a_idList)
+	{
+		idList = a_idList;
+	}
+	
+	public String getIdList ()
+	{
+		return idList;
+	}
+	
 	/**
 	 * @param a_url - url карточки
 	 */
@@ -125,6 +138,18 @@ public class Card extends TrelloObject
 	public String[] getIdChecklists()
 	{
 		return idChecklists;
+	}
+	
+	public String getValue (String a_key)
+	{
+		if (a_key.equals(TrelloAttribute.CLOSED)) return closed;
+		if (a_key.equals(TrelloAttribute.ID_LIST)) return idList;
+		if (a_key.equals(TrelloAttribute.NAME)) return name;
+		if (a_key.equals(TrelloAttribute.DESCRIPTION)) return desc;
+		if (a_key.equals(TrelloAttribute.DUE_COMPLETE)) return dueComplete;
+		if (a_key.equals(TrelloAttribute.DUE)) return due;
+		if (a_key.equals(TrelloAttribute.DATE_LAST_ACTIVITY)) return dateLastActivity;
+		return null;
 	}
 	
 	@Override
