@@ -6,11 +6,11 @@
          name="Trello Repository"
          point="org.eclipse.mylyn.tasks.ui.repositories">
       <connectorUi
-            brandingIcon="icons/icon.jpg"
+            brandingIcon="images/icon.jpg"
             class="mylyn.trello.ui.TrelloRepositoryConnectorUi"
             id="mylyn.trello.ui.TrelloRepositoryConnectorUi"
             name="Trello Repository Connector UI"
-            overlayIcon="icons/icon.jpg">
+            overlayIcon="images/icon.jpg">
       </connectorUi>
    </extension>
 
