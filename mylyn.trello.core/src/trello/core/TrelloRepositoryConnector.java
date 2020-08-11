@@ -111,6 +111,13 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	}
 	
 	@Override
+	public @NonNull TaskData getTaskData(@NonNull TaskRepository a_repository, @NonNull String a_taskId, 
+			                             IProgressMonitor a_monitor) throws CoreException
+	{
+		return m_taskDataHandler.getTaskData(a_repository, a_taskId, a_monitor);
+	}
+	
+	@Override
 	public @Nullable String getRepositoryUrlFromTaskUrl(@NonNull String a_taskUrl)
 	{
 		String repositoryUrlEnd = ".com/";
@@ -151,6 +158,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	@Nullable
 	public Collection<TaskRelation> getTaskRelations(@NonNull TaskData taskData)
 	{
+		
 		return new ArrayList<TaskRelation>();
 	}
 	
@@ -214,13 +222,6 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			//Date date = a_task.getModificationDate();
 			//a_task.setAttribute(TaskAttribute.DATE_MODIFICATION, (date != null) ? TracUtil.toTracTime(date) + "" : null); //$NON-NLS-1$
 		}
-	}
-
-	@Override
-	public @NonNull TaskData getTaskData(@NonNull TaskRepository a_repository, @NonNull String a_taskId, 
-			                             IProgressMonitor a_monitor) throws CoreException
-	{
-		return m_taskDataHandler.getTaskData(a_repository, a_taskId, a_monitor);
 	}
 	
 	public IStatus performQuery(TaskRepository a_repository, IRepositoryQuery a_query, TaskDataCollector a_resultCollector,
@@ -319,6 +320,9 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 			{
 				TaskData taskData = new TaskData(m_taskDataHandler.getAttributeMapper(a_repository), CONNECTOR_KIND, a_repository.getRepositoryUrl(), c.getId());
 				TaskAttribute root = taskData.getRoot();
+				root.createAttribute(TrelloAttribute.ID_LIST).setValue(c.getIdList());
+				root.createAttribute(TrelloAttribute.CLOSED).setValue(c.getClosed());
+				root.createAttribute(TrelloAttribute.DUE_COMPLETE).setValue(c.getDueComplete());
 				root.createAttribute(TaskAttribute.SUMMARY).setValue(c.getName());
 				root.createAttribute(TaskAttribute.TASK_URL).setValue(c.getUrl());
 				//root.createAttribute(TaskAttribute.ATTACHMENT_DESCRIPTION).setValue("desc");
@@ -342,7 +346,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 						{
 							if (a.getData().getOld().getDueComplete() != null)
 							{
-								if (actionCard.getDueComplete().equals("true"))
+								if (c.getDueComplete().equals("true"))//if (actionCard.getDueComplete().equals("true"))
 								{
 									createDateAttribute(taskData, TaskAttribute.DATE_COMPLETION, a.getDate());
 									break;
@@ -535,7 +539,7 @@ public class TrelloRepositoryConnector extends AbstractRepositoryConnector
 	public IStatus deleteTask(TaskRepository a_repository, ITask a_task, IProgressMonitor a_monitor) throws CoreException 
 	{
 		TrelloClient client = new TrelloClient();
-		try 
+		try
 		{
 			client.deleteCard(a_task.getTaskId());
 		} 
