@@ -86,7 +86,7 @@ public interface ITrelloClient
 	 */
 	String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws Exception;
 	
-	Card createCard () throws Exception;
+	Card createCard (String a_idList, Map<String, String> a_attributes) throws Exception;
 	
 	/**
 	 * Метод удаляет карточку из репозитория.

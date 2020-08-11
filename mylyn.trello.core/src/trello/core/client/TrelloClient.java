@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.mylyn.tasks.core.ITask;
@@ -158,10 +159,16 @@ public class TrelloClient implements ITrelloClient
 	}
 	
 	@Override
-	public Card createCard () throws IOException
+	public Card createCard (String a_idList, Map<String, String> a_attributes) throws IOException
 	{
+		StringBuilder parameterBuilder = new StringBuilder();
+		for (Entry<String, String> entry : a_attributes.entrySet())
+		{
+			parameterBuilder.append(entry.getKey() + "=" + entry.getValue());
+		}
+		
 		String line = connectByUrlAndGetResponse(ITrelloClient.POST_METHOD, m_mainUrlPart + "cards?" + 
-			    "idList=5eee983b50e5a487413562b4" + "&key=" + m_key + "&token=" + m_token);
+												 parameterBuilder.toString() + "&key=" + m_key + "&token=" + m_token);
 		Card card = null;
 		if (line != null)
 		{
@@ -171,10 +178,10 @@ public class TrelloClient implements ITrelloClient
 	}
 	
 	@Override
-	public String changeCard(String a_cardId, String a_attributeName, String a_attributeValue) throws IOException
+	public String changeCard(String a_cardId, String a_paramName, String a_paramValue) throws IOException
 	{
 		connectByUrlAndGetResponse(ITrelloClient.PUT_METHOD, m_mainUrlPart + "cards/" + a_cardId + 
-	    "?" + a_attributeName + "=" + URLEncoder.encode(a_attributeValue, encoding) + "&key=" + m_key + "&token=" + m_token);
+	    "?" + a_paramName + "=" + URLEncoder.encode(a_paramValue, encoding) + "&key=" + m_key + "&token=" + m_token);
 		Card card = getCardById(a_cardId);
 		return card.getUrl();
 	}
