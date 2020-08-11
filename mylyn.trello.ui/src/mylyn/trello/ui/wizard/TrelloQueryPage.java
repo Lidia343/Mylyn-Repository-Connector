@@ -23,9 +23,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import mylyn.trello.ui.calendar.CalendarDialog;
-import mylyn.trello.ui.handle.FinishHandler;
+import mylyn.trello.ui.handle.IResultHandler;
 import trello.core.TrelloRepositoryConnector;
-import trello.core.client.ITrelloClient;
 import trello.core.client.TrelloClient;
 import trello.core.model.Board;
 import trello.core.model.CardList;
@@ -933,7 +932,7 @@ public class TrelloQueryPage extends AbstractRepositoryQueryPage2
 		m_checklistMovingButton.setText("Also move checklists if they exist");
 		m_checklistMovingButton.setSelection(true);
 		
-		FinishHandler m_handler = new FinishHandler () 
+		IResultHandler m_handler = new IResultHandler () 
 		{
 			@Override
 			public void finish(String a_trelloDateAndTime, String a_dateAndTimeForShow)

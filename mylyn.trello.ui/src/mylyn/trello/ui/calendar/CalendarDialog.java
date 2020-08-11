@@ -13,13 +13,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Shell;
 
-import mylyn.trello.ui.handle.FinishHandler;
+import mylyn.trello.ui.handle.IResultHandler;
 
 import org.eclipse.swt.widgets.Button;
 
 public class CalendarDialog
 {
-	private FinishHandler m_handler;
+	private IResultHandler m_handler;
 	
 	private Shell m_parent;
 	private Shell m_calendarShell;
@@ -34,7 +34,7 @@ public class CalendarDialog
 	private String m_timeForShow = "";
 	private String m_dateAndTimeForShow = "";
 	
-	public CalendarDialog (Shell a_parent, FinishHandler a_handler)
+	public CalendarDialog (Shell a_parent, IResultHandler a_handler)
 	{
 		m_parent = a_parent;
 		m_handler = a_handler;
