@@ -1,46 +1,38 @@
 package mylyn.trello.ui.wizard;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.mylyn.tasks.core.TaskMapping;
-import org.eclipse.mylyn.tasks.core.data.TaskData;
 
 public class TrelloTaskMapping extends TaskMapping
 {
-	private Date m_completionDate;
-	private Date m_creationDate;
-	private String m_description;
-	private Date m_dueDate;
-	private Date m_modificationDate;
-	private String m_owner;
-	private String m_ownerId;
+	private List<String> m_cc;
 	private String m_summary;
-	private TaskData m_taskData;
-	private String m_taskKind;
-	private String m_taskUrl;
+	private String m_description;
+	private boolean m_dueComplete;
+	private Date m_dueDate;
 	
-	public void setCompletionDate (Date a_completionDate)
+	public void setCc (List<String> a_cc)
 	{
-		m_completionDate = a_completionDate;
-		m_completionDate = new Date();
+		m_cc = a_cc;
 	}
 	
 	@Override
-	public Date getCompletionDate()
+	public List<String> getCc ()
 	{
-		return m_completionDate;
+		return m_cc;
 	}
 	
-	public void setCreationDate (Date a_creationDate)
+	public void setSummary (String a_summary)
 	{
-		m_creationDate = a_creationDate;
-		m_creationDate = new Date();
+		m_summary = a_summary;
 	}
 	
 	@Override
-	public Date getCreationDate()
+	public String getSummary ()
 	{
-		return m_creationDate;
+		return m_summary;
 	}
 	
 	public void setDescription (String a_description)
@@ -54,98 +46,27 @@ public class TrelloTaskMapping extends TaskMapping
 	{
 		return m_description;
 	}
+	
+	public void setDueComplete (boolean a_dueComplete)
+	{
+		m_dueComplete = a_dueComplete;
+	}
+	
+	@Override
+	public Date getCompletionDate()
+	{
+		if (!m_dueComplete) return null;
+		return new Date();
+	}
 
 	public void setDueDate (Date a_dueDate)
 	{
 		m_dueDate = a_dueDate;
-		m_dueDate = new Date(234245235);
 	}
 	
 	@Override
 	public Date getDueDate()
 	{
 		return m_dueDate;
-	}
-
-	public void setModificationDate (Date a_modificationDate)
-	{
-		m_modificationDate = a_modificationDate;
-		m_modificationDate = new Date();
-	}
-	
-	@Override
-	public Date getModificationDate()
-	{
-		return m_modificationDate;
-	}
-
-	public void setOwner (String a_owner)
-	{
-		m_owner = a_owner;
-		m_owner = "Lidia343";
-	}
-	
-	@Override
-	public String getOwner ()
-	{
-		return m_owner;
-	}
-
-	public void setOwnerId (String a_ownerId)
-	{
-		m_ownerId = a_ownerId;
-		m_ownerId = "324253234";
-	}
-	
-	@Override
-	public String getOwnerId()
-	{
-		return m_ownerId;
-	}
-
-	public void setSummary (String a_summary)
-	{
-		m_summary = a_summary;
-	}
-	
-	@Override
-	public String getSummary ()
-	{
-		return m_summary;
-	}
-
-	public void setTaskData (TaskData a_taskData)
-	{
-		m_taskData = a_taskData;
-	}
-	
-	@Override
-	public TaskData getTaskData()
-	{
-		return m_taskData;
-	}
-	
-	public void setTaskKind (String a_taskKind)
-	{
-		m_taskKind = a_taskKind;
-		m_taskKind = null;
-	}
-
-	@Override
-	public String getTaskKind ()
-	{
-		return m_taskKind;
-	}
-
-	public void setTaskUrl (String a_taskUrl)
-	{
-		m_taskUrl = a_taskUrl;
-		m_taskUrl = "trello.com/dgergerg234423";
-	}
-	
-	@Override
-	public String getTaskUrl ()
-	{
-		return m_taskUrl;
 	}
 }
