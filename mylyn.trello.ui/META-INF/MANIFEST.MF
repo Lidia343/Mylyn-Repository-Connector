@@ -15,4 +15,5 @@ Require-Bundle: org.eclipse.mylyn.tasks.ui,
  mylyn.trello.ui,
  org.eclipse.ui,
  trello.core,
- org.eclipse.mylyn.commons.workbench
+ org.eclipse.mylyn.commons.workbench,
+ org.eclipse.mylyn.commons.core

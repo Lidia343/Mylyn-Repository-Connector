@@ -1,32 +1,90 @@
 package trello.core.model;
 
-import trello.core.TrelloAttribute;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Класс необходим для хранения информации о карточке.
+ * Карточка Trello.
  */
 public class Card extends TrelloObject
 {
+	/**
+	 * Ключ, соответствующий одному из свойств карточки.
+	 */
+	public enum Key
+	{
+		CLOSED("closed"), DATE_COMPLETION("date"),
+		DATE_CREATION("date"), DATE_LAST_ACTIVITY("dateLastActivity"),
+		DESCRIPTION("desc"), DUE("due"), DUE_COMPLETE("dueComplete"),
+		ID("id"), ID_LIST("idList"), NAME("name"), OWNER("owner"),
+		TYPE("type"), URL("url");
+		
+		public static Key fromKey (String a_name)
+		{
+			for (Key key : Key.values())
+			{
+				if (key.getKey().equals(a_name))
+				{
+					return key;
+				}
+			}
+			return null;
+		}
+		
+		private String m_key;
+		
+		Key (String a_key)
+		{
+			m_key = a_key;
+		}
+		
+		@Override
+		public String toString ()
+		{
+			return m_key;
+		}
+		
+		public String getKey ()
+		{
+			return m_key;
+		}
+	}
+	
+	/**Отображение, хранящее значения свойств карточки по ключу.*/
+	private final Map<Key, String> m_valueByKey = new HashMap<>();
+	
 	private String closed;
+	private String dateLastActivity;
 	private String desc;
-	private String idList;
-	private String url;
 	private String due;
 	private String dueComplete;
-	private String dateLastActivity;
 	private String[] idChecklists;
-
-	/**
-	 * Конструктор класса Card.
-	 */
-	public Card()
+	private String idList;
+	private String url;
+	
+	public String getValue (Key a_key)
 	{
-		name = "";
+		return m_valueByKey.get(a_key);
 	}
-
-	public void setClosed (String a_closed)
+	
+	public Map<String, String> getValues ()
 	{
-		closed = a_closed;
+		Map<String, String> result = new HashMap<>();
+		for (Key key : m_valueByKey.keySet())
+		{
+			result.put(key.getKey(), m_valueByKey.get(key));
+		}
+		return result;
+	}
+	
+	public void putValue (Key a_key, String a_value)
+	{
+		m_valueByKey.put(a_key, a_value);
+	}
+	
+	public void setIdChecklists (String[] a_idChecklists)
+	{
+		idChecklists = a_idChecklists;
 	}
 	
 	public String getClosed ()
@@ -34,17 +92,29 @@ public class Card extends TrelloObject
 		return closed;
 	}
 	
-	/** 
-	 * @param a_name - описание карточки
-	 */
-	public void setDesc(String a_desc)
+	public String getDateLastActivity()
 	{
-		desc = a_desc;
+		return dateLastActivity;
 	}
-
-	public void setIdList (String a_idList)
+	
+	public String getDesc()
 	{
-		idList = a_idList;
+		return desc;
+	}
+	
+	public String getDue()
+	{
+		return due;
+	}
+	
+	public String getDueComplete()
+	{
+		return dueComplete;
+	}
+	
+	public String[] getIdChecklists()
+	{
+		return idChecklists;
 	}
 	
 	public String getIdList ()
@@ -52,117 +122,8 @@ public class Card extends TrelloObject
 		return idList;
 	}
 	
-	/**
-	 * @param a_url - url карточки
-	 */
-	public void setUrl(String a_url)
-	{
-		url = a_url;
-	}
-
-	/**
-	 * @param a_due - запланированная дата выполнения карточки
-	 */
-	public void setDue(String a_due)
-	{
-		due = a_due;
-	}
-	
-	/** 
-	 * @param a_dueComplete - состояние выполнена/нет карточки
-	 */
-	public void setDueComlete(String a_dueComplete)
-	{
-		dueComplete = a_dueComplete;
-	}
-	
-	/**
-	 * @param a_dateLastActivity - дата последнего действия с карточкой
-	 */
-	public void setDateLastActivity(String a_dateLastActivity)
-	{
-		dateLastActivity = a_dateLastActivity;
-	}
-	
-	/**
-	 * @param a_idChecklists - массив id чек-листов карточки
-	 */
-	public void setIdChecklists(String[] a_idChecklists)
-	{
-		idChecklists = a_idChecklists;
-	}
-	
-	/**
-	 * @return описание карточки
-	 */
-	public String getDesc()
-	{
-		return desc;
-	}
-
-	/**
-	 * @return URL карточки
-	 */
 	public String getUrl()
 	{
 		return url;
-	}
-
-	/**
-	 * @return запланированную дату завершения карточки
-	 */
-	public String getDue()
-	{
-		return due;
-	}
-
-	/**
-	 * @return состояние выполнена/нет карточки
-	 */
-	public String getDueComplete()
-	{
-		return dueComplete;
-	}
-	
-	/**
-	 * @return дату последнего действия с карточкой
-	 */
-	public String getDateLastActivity()
-	{
-		return dateLastActivity;
-	}
-
-	/**
-	 * @return массив id чек-листов карточки
-	 */
-	public String[] getIdChecklists()
-	{
-		return idChecklists;
-	}
-	
-	public String getValue (String a_key)
-	{
-		if (a_key.equals(TrelloAttribute.CLOSED)) return closed;
-		if (a_key.equals(TrelloAttribute.ID_LIST)) return idList;
-		if (a_key.equals(TrelloAttribute.NAME)) return name;
-		if (a_key.equals(TrelloAttribute.DESCRIPTION)) return desc;
-		if (a_key.equals(TrelloAttribute.DUE_COMPLETE)) return dueComplete;
-		if (a_key.equals(TrelloAttribute.DUE)) return due;
-		if (a_key.equals(TrelloAttribute.DATE_LAST_ACTIVITY)) return dateLastActivity;
-		return null;
-	}
-	
-	@Override
-	public String toString ()
-	{
-		String ids = "";
-		if (idChecklists != null)
-		for (String s : idChecklists)
-		{
-			ids += (s + "\n");
-		}
-		return "Id: " + id + "\nName: " + name + "\nDesc: " + desc + "\nUrl: " + url + "\nClosed: " +"\nDue: "
-				+ due + "\nDueComplete: " + dueComplete + "\nDateLastActivity: " + dateLastActivity
-				+ "\nIdChecklists:\n" + ids;
 	}
 }
